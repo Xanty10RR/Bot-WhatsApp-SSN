@@ -19,7 +19,7 @@ npm run dev
 
 ## Documentation
 
-This project uses and adapts information from the [official BuilderBot documentation](https://builderbot.vercel.app/) consult to learn how to use all the features and characteristics of the library.
+This project uses and adapts information from the [official BuilderBot documentation](https://builderbot.vercel.app/), consult to learn how to use all the features and characteristics of the library.
 
 ## Contact me
 
