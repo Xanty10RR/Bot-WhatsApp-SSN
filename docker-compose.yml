@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  whatsapp-bot:
+    build: .
+    container_name: whatsapp-bot
+    ports:
+      - "3001:3001"   # Cambia el puerto si es distinto
+    env_file:
+      - .env
+    restart: always
