@@ -116,7 +116,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
                 memory[ctx.from] = coincidenciasTotales;
 
                 // Agrupar coincidencias por archivo
-                const agrupadas = {
+                const agrupadas: { [key: string]: any[] } = {
                     'AVAL.xlsx': [] as any[],
                     'BBVA.xlsx': [] as any[],
                     'AGRARIO.xlsx': [] as any[]
