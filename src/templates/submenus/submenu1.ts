@@ -20,7 +20,7 @@ const mostrarMenuOpciones = async (flowDynamic: any) => {
         }
     ]);
 };
-const handleOptions = async (ctx, { gotoFlow, flowDynamic }) => {
+const handleOptions = async (ctx: any, { flowDynamic, gotoFlow }: any) => {
     const body = ctx.body?.trim();
 
     if (body?.includes('Nueva Búsqueda') || body?.includes('🔄')) {
