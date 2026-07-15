@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "target": "ES2022",
     "module": "ES2022",
+    "noImplicitAny": true,
     "declaration": false,
     "declarationMap": false,
     "moduleResolution": "node",

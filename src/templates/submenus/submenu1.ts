@@ -20,7 +20,7 @@ const mostrarMenuOpciones = async (flowDynamic: any) => {
         }
     ]);
 };
-const handleOptions = async (ctx, { gotoFlow, flowDynamic }) => {
+const handleOptions = async (ctx: any, { flowDynamic, gotoFlow }: any) => {
     const body = ctx.body?.trim();
 
     if (body?.includes('Nueva Búsqueda') || body?.includes('🔄')) {
@@ -84,7 +84,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
                 const coincidenciasTotales: any[] = [];
 
                 for (const archivo of archivos) {
-                    const excelPath = resolve(__dirname, '..', 'src','templates','submenus','data', archivo);
+                    const excelPath = resolve(__dirname, 'data', archivo);
                     const workbook = XLSX.readFile(excelPath);
                     const sheetName = workbook.SheetNames[0];
                     const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: "A" }) as any[];
@@ -116,7 +116,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
                 memory[ctx.from] = coincidenciasTotales;
 
                 // Agrupar coincidencias por archivo
-                const agrupadas = {
+                const agrupadas: { [key: string]: any[] } = {
                     'AVAL.xlsx': [] as any[],
                     'BBVA.xlsx': [] as any[],
                     'AGRARIO.xlsx': [] as any[]
@@ -236,7 +236,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         // 2. Manejar la imagen si existe
         if (nit) {
             try {
-                const imagesPath = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'templates', 'submenus', 'images');
+                const imagesPath = resolve(__dirname, 'images');
                 const imagePath = resolve(imagesPath, `${nit}.png`);
                 
                 if (existsSync(imagePath)) {
@@ -287,3 +287,4 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         { capture: true },
         handleOptions 
     );
+    
