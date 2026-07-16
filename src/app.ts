@@ -3,6 +3,7 @@ import { MemoryDB } from '@builderbot/bot';
 import { provider } from './provider';
 import { config } from './config';
 import templates from './templates';
+import './provider/database';
 
 const main = async () => {
     const { httpServer } = await createBot({
