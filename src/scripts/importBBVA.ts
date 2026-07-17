@@ -44,8 +44,8 @@ async function importar() {
                 ],
         };
 
-        console.log(Object.keys(row));
-break;
+        console.log(registro);
+        break;
 
 await pool.query(
             `
