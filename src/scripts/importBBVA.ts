@@ -1,23 +1,70 @@
-import XLSX from 'xlsx';
-import { pool } from '../provider/database';
+import XLSX from "xlsx";
+import { pool } from "../provider/database";
 
-const workbook = XLSX.readFile('./excels/BBVA.xlsx');
+// Leer archivo
+const workbook = XLSX.readFile("./excels/BBVA.xlsx");
 
+// Primera hoja
 const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-const data = XLSX.utils.sheet_to_json(sheet, {
-    range: 1
+// Empezar desde la fila 2 (la fila 1 es el título grande)
+const rows = XLSX.utils.sheet_to_json(sheet, {
+    range: 1,
 });
 
-console.log(`Total registros: ${data.length}`);
-console.log(data[0]);
+console.log(`Total registros: ${rows.length}`);
 
-const datos = rows.map((row: any) => {
-    const limpio: any = {};
+async function importar() {
 
-    Object.keys(row).forEach((key) => {
-        limpio[key.trim()] = row[key];
-    });
+    for (const row of rows as any[]) {
 
-    return limpio;
-});
+        const registro = {
+            codigo_convenio: row["codigo convenio"],
+            nombre_convenio: row["Nombre"],
+            nit: row["NIT"],
+            que_se_recauda: row["Que se recauda "],
+            categoria: row["Categoria "],
+            tipo_captura: row["Tipo de Captura "],
+            ubicacion: row["UBICACIÓN"],
+            referencias: row["REFERENCIAS"],
+            forma_consulta:
+                row[
+                    "FORMA CONSULTA DATOS (WEB SERVICE (W) BASE DE DATOS (S) O NO CONSULTA (N)"
+                ],
+        };
+
+        await pool.query(
+            `
+            INSERT INTO bbva (
+                codigo_convenio,
+                nombre_convenio,
+                nit,
+                que_se_recauda,
+                categoria,
+                tipo_captura,
+                ubicacion,
+                referencias,
+                forma_consulta
+            )
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+            `,
+            [
+                registro.codigo_convenio,
+                registro.nombre_convenio,
+                registro.nit,
+                registro.que_se_recauda,
+                registro.categoria,
+                registro.tipo_captura,
+                registro.ubicacion,
+                registro.referencias,
+                registro.forma_consulta,
+            ]
+        );
+    }
+
+    console.log("✅ Importación terminada");
+
+    await pool.end();
+}
+
+importar().catch(console.error);
