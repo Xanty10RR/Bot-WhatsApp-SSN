@@ -11,3 +11,13 @@ const data = XLSX.utils.sheet_to_json(sheet, {
 
 console.log(`Total registros: ${data.length}`);
 console.log(data[0]);
+
+const datos = rows.map((row: any) => {
+    const limpio: any = {};
+
+    Object.keys(row).forEach((key) => {
+        limpio[key.trim()] = row[key];
+    });
+
+    return limpio;
+});
