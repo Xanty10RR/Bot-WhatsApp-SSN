@@ -7,24 +7,35 @@ const workbook = XLSX.readFile("./excels/BBVA.xlsx");
 // Primera hoja
 const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-// Empezar desde la fila 2 (la fila 1 es el título grande)
+// Leer desde la fila 2
 const rows = XLSX.utils.sheet_to_json(sheet, {
     range: 1,
 });
 
 console.log(`Total registros: ${rows.length}`);
 
+// Limpiar espacios de los encabezados
+const datos = (rows as any[]).map((row) => {
+    const limpio: any = {};
+
+    Object.keys(row).forEach((key) => {
+        limpio[key.trim()] = row[key];
+    });
+
+    return limpio;
+});
+
 async function importar() {
 
-    for (const row of rows as any[]) {
+    for (const row of datos) {
 
         const registro = {
             codigo_convenio: row["codigo convenio"],
             nombre_convenio: row["Nombre"],
             nit: row["NIT"],
-            que_se_recauda: row["Que se recauda "],
+            que_se_recauda: row["Que se recauda"],
             categoria: row["Categoria "],
-            tipo_captura: row["Tipo de Captura "],
+            tipo_captura: row["Tipo de Captura"],
             ubicacion: row["UBICACIÓN"],
             referencias: row["REFERENCIAS"],
             forma_consulta:
@@ -33,7 +44,10 @@ async function importar() {
                 ],
         };
 
-        await pool.query(
+        console.log(Object.keys(row));
+break;
+
+await pool.query(
             `
             INSERT INTO bbva (
                 codigo_convenio,
