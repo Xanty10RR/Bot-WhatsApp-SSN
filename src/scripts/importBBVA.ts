@@ -1,7 +1,7 @@
 import XLSX from 'xlsx';
 import { pool } from '../provider/database';
 
-const workbook = XLSX.readFile('./src/templates/BBVA.xlsx');
+const workbook = XLSX.readFile('./excels/BBVA.xlsx');
 
 const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
