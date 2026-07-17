@@ -34,7 +34,7 @@ async function importar() {
             nombre_convenio: row["Nombre"],
             nit: row["NIT"],
             que_se_recauda: row["Que se recauda"],
-            categoria: row["Categoria "],
+            categoria: row["Categoria"],
             tipo_captura: row["Tipo de Captura"],
             ubicacion: row["UBICACIÓN"],
             referencias: row["REFERENCIAS"],
