@@ -40,14 +40,14 @@ async function importar() {
             referencias: row["REFERENCIAS"],
             forma_consulta:
                 row[
-                    "FORMA CONSULTA DATOS (WEB SERVICE (W) BASE DE DATOS (S) O NO CONSULTA (N)"
+                "FORMA CONSULTA DATOS (WEB SERVICE (W) BASE DE DATOS (S) O NO CONSULTA (N)"
                 ],
         };
 
         console.log(registro);
         break;
 
-await pool.query(
+        await pool.query(
             `
             INSERT INTO bbva (
                 codigo_convenio,
@@ -61,6 +61,9 @@ await pool.query(
                 forma_consulta
             )
             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+            
+            ON CONFLICT (codigo_convenio)
+            DO NOTHING;
             `,
             [
                 registro.codigo_convenio,
@@ -74,11 +77,11 @@ await pool.query(
                 registro.forma_consulta,
             ]
         );
+
+        console.log("✅ Importación terminada");
+
+        await pool.end();
     }
-
-    console.log("✅ Importación terminada");
-
-    await pool.end();
 }
 
 importar().catch(console.error);
