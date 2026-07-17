@@ -1,7 +1,7 @@
 import XLSX from "xlsx";
 import { pool } from "../provider/database";
 
-// Leer archivo
+// Leer el archivo excel bbva
 const workbook = XLSX.readFile("./excels/BBVA.xlsx");
 
 // Primera hoja
@@ -9,46 +9,44 @@ const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
 // Leer desde la fila 2
 const rows = XLSX.utils.sheet_to_json(sheet, {
-    range: 1,
+  range: 1,
 });
 
 console.log(`Total registros: ${rows.length}`);
 
 // Limpiar espacios de los encabezados
 const datos = (rows as any[]).map((row) => {
-    const limpio: any = {};
+  const limpio: any = {};
 
-    Object.keys(row).forEach((key) => {
-        limpio[key.trim()] = row[key];
-    });
+  Object.keys(row).forEach((key) => {
+    limpio[key.trim()] = row[key];
+  });
 
-    return limpio;
+  return limpio;
 });
 
+let contador = 0;
+
 async function importar() {
+  for (const row of datos) {
+    const registro = {
+      codigo_convenio: row["codigo convenio"],
+      nombre_convenio: row["Nombre"],
+      nit: row["NIT"],
+      que_se_recauda: row["Que se recauda"],
+      categoria: row["Categoria"],
+      tipo_captura: row["Tipo de Captura"],
+      ubicacion: row["UBICACIÓN"],
+      referencias: row["REFERENCIAS"],
+      forma_consulta:
+        row[
+          "FORMA CONSULTA DATOS (WEB SERVICE (W) BASE DE DATOS (S) O NO CONSULTA (N)"
+        ],
+    };
 
-    for (const row of datos) {
-
-        const registro = {
-            codigo_convenio: row["codigo convenio"],
-            nombre_convenio: row["Nombre"],
-            nit: row["NIT"],
-            que_se_recauda: row["Que se recauda"],
-            categoria: row["Categoria"],
-            tipo_captura: row["Tipo de Captura"],
-            ubicacion: row["UBICACIÓN"],
-            referencias: row["REFERENCIAS"],
-            forma_consulta:
-                row[
-                "FORMA CONSULTA DATOS (WEB SERVICE (W) BASE DE DATOS (S) O NO CONSULTA (N)"
-                ],
-        };
-
-        console.log(registro);
-        break;
-
-        await pool.query(
-            `
+    contador++;
+    await pool.query(
+      `
             INSERT INTO bbva (
                 codigo_convenio,
                 nombre_convenio,
@@ -65,23 +63,27 @@ async function importar() {
             ON CONFLICT (codigo_convenio)
             DO NOTHING;
             `,
-            [
-                registro.codigo_convenio,
-                registro.nombre_convenio,
-                registro.nit,
-                registro.que_se_recauda,
-                registro.categoria,
-                registro.tipo_captura,
-                registro.ubicacion,
-                registro.referencias,
-                registro.forma_consulta,
-            ]
-        );
+      [
+        registro.codigo_convenio,
+        registro.nombre_convenio,
+        registro.nit,
+        registro.que_se_recauda,
+        registro.categoria,
+        registro.tipo_captura,
+        registro.ubicacion,
+        registro.referencias,
+        registro.forma_consulta,
+      ],
+    );
 
-        console.log("✅ Importación terminada");
-
-        await pool.end();
+    if (contador % 500 === 0) {
+      console.log(`✅ ${contador} registros importados`);
     }
+
+    console.log(`🎉 Se importaron ${contador} registros`);
+
+    await pool.end();
+  }
 }
 
 importar().catch(console.error);
