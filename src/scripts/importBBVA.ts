@@ -1,7 +1,7 @@
 import XLSX from "xlsx";
 import { pool } from "../provider/database";
 
-// Leer el archivo excel bbva
+// Leer archivo excel bbva
 const workbook = XLSX.readFile("./excels/BBVA.xlsx");
 
 // Primera hoja
@@ -25,9 +25,9 @@ const datos = (rows as any[]).map((row) => {
   return limpio;
 });
 
-let contador = 0;
-
 async function importar() {
+  let contador = 0;
+
   for (const row of datos) {
     const registro = {
       codigo_convenio: row["codigo convenio"],
@@ -44,25 +44,24 @@ async function importar() {
         ],
     };
 
-    contador++;
     await pool.query(
       `
-            INSERT INTO bbva (
-                codigo_convenio,
-                nombre_convenio,
-                nit,
-                que_se_recauda,
-                categoria,
-                tipo_captura,
-                ubicacion,
-                referencias,
-                forma_consulta
-            )
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-            
-            ON CONFLICT (codigo_convenio)
-            DO NOTHING;
-            `,
+      INSERT INTO bbva (
+        codigo_convenio,
+        nombre_convenio,
+        nit,
+        que_se_recauda,
+        categoria,
+        tipo_captura,
+        ubicacion,
+        referencias,
+        forma_consulta
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+
+      ON CONFLICT (codigo_convenio)
+      DO NOTHING;
+      `,
       [
         registro.codigo_convenio,
         registro.nombre_convenio,
@@ -73,17 +72,19 @@ async function importar() {
         registro.ubicacion,
         registro.referencias,
         registro.forma_consulta,
-      ],
+      ]
     );
 
+    contador++;
+
     if (contador % 500 === 0) {
-      console.log(`✅ ${contador} registros importados`);
+      console.log(`✅ ${contador} registros procesados`);
     }
-
-    console.log(`🎉 Se importaron ${contador} registros`);
-
-    await pool.end();
   }
+
+  console.log(`🎉 Se procesaron ${contador} registros`);
+
+  await pool.end();
 }
 
 importar().catch(console.error);
