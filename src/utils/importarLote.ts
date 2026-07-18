@@ -5,7 +5,8 @@ export async function importarLote(
     tabla: string,
     columnas: string[],
     datos: any[],
-    tamanoLote = 200
+    tamanoLote = 200,
+    columnaConflicto?: string
 ) {
     let total = 0;
 
@@ -18,9 +19,9 @@ export async function importarLote(
 
         lote.forEach((fila, filaIndex) => {
 
-            const params = columnas.map((_, colIndex) => {
-                return `$${filaIndex * columnas.length + colIndex + 1}`;
-            });
+            const params = columnas.map((_, colIndex) =>
+                `$${filaIndex * columnas.length + colIndex + 1}`
+            );
 
             placeholders.push(`(${params.join(",")})`);
 
@@ -29,16 +30,19 @@ export async function importarLote(
             });
         });
 
-        await pool.query(
-            `
+        let sql = `
             INSERT INTO ${tabla} (${columnas.join(",")})
             VALUES ${placeholders.join(",")}
+        `;
 
-            ON CONFLICT (codigo_convenio)
-            DO NOTHING;
-            `,
-            values
-        );
+        if (columnaConflicto) {
+            sql += `
+                ON CONFLICT (${columnaConflicto})
+                DO NOTHING
+            `;
+        }
+
+        await pool.query(sql, values);
 
         total += lote.length;
 
