@@ -16,7 +16,7 @@ const rows = XLSX.utils.sheet_to_json(sheet, {
 
 console.log(`Total registros: ${rows.length}`);
 
-// Limpiar espacios de los encabezados
+// Limpiar encabezados
 const datos = (rows as any[]).map((row) => {
     const limpio: any = {};
 
