@@ -1,5 +1,6 @@
 import XLSX from "xlsx";
 import { pool } from "../provider/database";
+import { importarLote } from "../utils/importarLote";
 
 // Leer archivo excel agrario
 const workbook = XLSX.readFile("./excels/AGRARIO.xlsx");
@@ -7,9 +8,10 @@ const workbook = XLSX.readFile("./excels/AGRARIO.xlsx");
 // Primera hoja
 const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-// Leer desde la fila 2
+// Leer datos
 const rows = XLSX.utils.sheet_to_json(sheet, {
     range: 1,
+    raw: false,
 });
 
 console.log(`Total registros: ${rows.length}`);
@@ -19,70 +21,45 @@ const datos = (rows as any[]).map((row) => {
     const limpio: any = {};
 
     Object.keys(row).forEach((key) => {
-        limpio[key.trim()] = row[key];
+        const nuevaKey = key
+            .replace(/\u00A0/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+        limpio[nuevaKey] = row[key];
     });
 
-    return limpio;
+    return {
+        codigo_convenio: limpio["CODIGO"],
+        nombre_convenio: limpio["Nombre Convenio"],
+        nit_convenio: limpio["Nit Convenio"],
+        referencia: limpio["Referencia"],
+        tipo_referencia: limpio["Tipo Referencia"],
+        longitud_referencia: limpio["Longitud Referencia"],
+        codigo_barras: limpio["Codigo Barras"],
+        valida_fecha: limpio["Valida Fecha"],
+        manual: limpio["Manual"],
+    };
 });
 
 async function importar() {
-
-    let contador = 0;
-
-    for (const row of datos) {
-
-        const registro = {
-            codigo_convenio: row["CODIGO"],
-            nombre_convenio: row["Nombre Convenio"],
-            nit_convenio: row["Nit Convenio"],
-            referencia: row["Referencia"],
-            tipo_referencia: row["Tipo Referencia"],
-            longitud_referencia: row["Longitud Referencia"],
-            codigo_barras: row["Codigo Barras"],
-            valida_fecha: row["Valida Fecha"],
-            manual: row["Manual"],
-        };
-
-        await pool.query(
-            `
-            INSERT INTO agrario(
-                codigo_convenio,
-                nombre_convenio,
-                nit_convenio,
-                referencia,
-                tipo_referencia,
-                longitud_referencia,
-                codigo_barras,
-                valida_fecha,
-                manual
-            )
-
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-
-            ON CONFLICT (codigo_convenio)
-            DO NOTHING;
-            `,
-            [
-                registro.codigo_convenio,
-                registro.nombre_convenio,
-                registro.nit_convenio,
-                registro.referencia,
-                registro.tipo_referencia,
-                registro.longitud_referencia,
-                registro.codigo_barras,
-                registro.valida_fecha,
-                registro.manual,
-            ]
-        );
-
-        contador++;
-
-        if (contador % 500 === 0) {
-            console.log(`✅ ${contador} registros procesados`);
-        }
-    }
-
-    console.log(`🎉 Se procesaron ${contador} registros`);
+    await importarLote(
+        pool,
+        "agrario",
+        [
+            "codigo_convenio",
+            "nombre_convenio",
+            "nit_convenio",
+            "referencia",
+            "tipo_referencia",
+            "longitud_referencia",
+            "codigo_barras",
+            "valida_fecha",
+            "manual",
+        ],
+        datos,
+        200
+    );
 
     await pool.end();
 }
