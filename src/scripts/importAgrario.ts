@@ -1,7 +1,7 @@
 import XLSX from "xlsx";
 import { pool } from "../provider/database";
 
-// Leer archivo
+// Leer archivo excel agrario
 const workbook = XLSX.readFile("./excels/AGRARIO.xlsx");
 
 // Primera hoja
@@ -14,7 +14,7 @@ const rows = XLSX.utils.sheet_to_json(sheet, {
 
 console.log(`Total registros: ${rows.length}`);
 
-// Limpiar encabezados
+// Limpiar espacios de los encabezados
 const datos = (rows as any[]).map((row) => {
     const limpio: any = {};
 
