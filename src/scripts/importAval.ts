@@ -37,7 +37,10 @@ const datos = (rows as any[]).map((row) => {
     convenio: limpio["CONVENIO"],
     sigla: limpio["SIGLA"],
     categoria: limpio["CATEGORIA"],
-    descripcion_recaudo: limpio["DESCRIPCION RECAUDO"],
+    descripcion_recaudo:
+      !limpio["DESCRIPCION RECAUDO"] || limpio["DESCRIPCION RECAUDO"] === "."
+        ? "SIN DESCRIPCION"
+        : limpio["DESCRIPCION RECAUDO"],
     dato_captura: limpio["DATO CAPTURA"],
     modalidad: limpio["MODALIDAD"],
     longitud_referencia: limpio["LONGITUD DE REFERENCIA"],
@@ -51,36 +54,37 @@ const datos = (rows as any[]).map((row) => {
   };
 });
 
+const columnas = [
+  "estado",
+  "nura",
+  "nit",
+  "empresa",
+  "convenio",
+  "sigla",
+  "categoria",
+  "descripcion_recaudo",
+  "dato_captura",
+  "modalidad",
+  "longitud_referencia",
+  "ciudad",
+  "departamento",
+  "modalidad_captura",
+  "valida_fecha_vencimiento",
+  "recibe_pagos_parciales",
+  "monto",
+  "banco_dueno",
+];
+
 console.log(datos[0]);
 
 async function importar() {
   await importarLote(
-    pool,
-    "aval",
-    [
-      "estado",
-      "nura",
-      "nit",
-      "empresa",
-      "convenio",
-      "sigla",
-      "categoria",
-      "descripcion_recaudo",
-      "dato_captura",
-      "modalidad",
-      "longitud_referencia",
-      "ciudad",
-      "departamento",
-      "modalidad_captura",
-      "valida_fecha_vencimiento",
-      "recibe_pagos_parciales",
-      "monto",
-      "banco_dueno",
-    ],
-    datos,
-    200,
-  );
-
+    pool, 
+    "aval", 
+    columnas, 
+    datos, 
+    200
+);
   await pool.end();
 }
 
