@@ -287,4 +287,3 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         { capture: true },
         handleOptions 
     );
-    
