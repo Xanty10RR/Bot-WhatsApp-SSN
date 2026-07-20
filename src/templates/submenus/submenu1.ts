@@ -2,8 +2,6 @@ import { ConvenioService } from "../../services/convenio.service";
 import { formatearBusqueda } from "../../utils/formatearBusqueda";
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import { mainFlow } from "../mainFlow";
 
 const mostrarMenuOpciones = async (flowDynamic: any) => {
@@ -19,11 +17,12 @@ const mostrarMenuOpciones = async (flowDynamic: any) => {
     },
   ]);
 };
-const handleOptions = async (ctx: any, { flowDynamic, gotoFlow }: any) => {
+
+const handleOptions = async (ctx: any, { flowDynamic, gotoFlow, state }: any) => {
   const body = ctx.body?.trim();
 
   if (body?.includes("Nueva Búsqueda") || body?.includes("🔄")) {
-    delete memory[ctx.from];
+    await state.clear();
     return gotoFlow(submenu1Flow);
   }
 
@@ -47,34 +46,6 @@ export const buscarConvenioFlow = addKeyword([
   "buscar convenio",
   "convenio",
 ]);
-const equivalencias: { [clave: string]: string[] } = {
-  "tarjeta credito": [
-    "tarjeta de credito",
-    "tc",
-    "tajerta credito",
-    "tarjeta crédito",
-  ],
-  "credito vehiculo": ["vehiculo", "vehículo", "crédito vehículo"],
-  "credito libre": ["libre inversion", "libre inversión"],
-  // otros términos aquí
-};
-
-function obtenerSinonimos(entrada: string): string[] {
-  const texto = entrada.trim().toLowerCase();
-
-  for (const [clave, sinonimos] of Object.entries(equivalencias)) {
-    if (clave === texto || sinonimos.includes(texto)) {
-      return [clave, ...sinonimos];
-    }
-  }
-
-  return [texto]; // si no tiene sinónimos definidos
-}
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const memory: Record<string, any[]> = {};
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   .addAnswer(
