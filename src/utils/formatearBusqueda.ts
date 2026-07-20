@@ -14,12 +14,12 @@ export function formatearBusqueda(
     return `❌ No encontré convenios para:\n\n${texto}\n\nPuedes buscar por:\n• NIT\n• Empresa\n• Convenio\n• Sigla`;
   }
 
-  let mensaje = `🔎 *Búsqueda:* ${texto}\n\n`;
-  mensaje += `Se encontraron *${resultado.total}* coincidencias.\n\n`;
+  let mensaje = `🔎 Búsqueda: ${texto}\n\n`;
+  mensaje += `Se encontraron ${resultado.total} coincidencias.\n\n`;
 
   if (resultado.bbva.length > 0) {
 
-    mensaje += `🏦 *BBVA* (${resultado.bbva.length})\n\n`;
+    mensaje += `🏦 BBVA (${resultado.bbva.length})\n\n`;
 
     resultado.bbva.forEach((item, index) => {
 
@@ -35,7 +35,7 @@ export function formatearBusqueda(
 
   if (resultado.agrario.length > 0) {
 
-    mensaje += `🏦 *Banco Agrario* (${resultado.agrario.length})\n\n`;
+    mensaje += `🏦 Banco Agrario (${resultado.agrario.length})\n\n`;
 
     resultado.agrario.forEach((item, index) => {
 
@@ -51,7 +51,7 @@ export function formatearBusqueda(
 
   if (resultado.aval.length > 0) {
 
-    mensaje += `🏦 *Grupo Aval* (${resultado.aval.length})\n\n`;
+    mensaje += `🏦 Grupo Aval (${resultado.aval.length})\n\n`;
 
     resultado.aval.forEach((item, index) => {
 
