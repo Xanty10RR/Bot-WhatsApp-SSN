@@ -28,7 +28,7 @@ export function formatearBusqueda(
       mensaje += `NIT: ${item.nit}\n\n`;
     });
 
-    mensaje += "────────────────────\n\n";
+    mensaje += "══════════════════════\n\n";
   }
 
   if (resultado.agrario.length > 0) {
@@ -42,7 +42,7 @@ export function formatearBusqueda(
       mensaje += `NIT: ${item.nit}\n\n`;
     });
 
-    mensaje += "────────────────────\n\n";
+    mensaje += "══════════════════════\n\n";
   }
 
   if (resultado.aval.length > 0) {
