@@ -1,9 +1,16 @@
 import { ConvenioService } from "../services/convenio.service";
+import { formatearBusqueda } from "../utils/formatearBusqueda";
 
 async function main() {
-    const resultados = await ConvenioService.buscar("COMCEL");
 
-    console.log(JSON.stringify(resultados, null, 2));
+    const texto = "COMCEL";
+
+    const resultado = await ConvenioService.buscar(texto);
+
+    const mensaje = formatearBusqueda(texto, resultado);
+
+    console.log(mensaje);
+
 }
 
 main().catch(console.error);
