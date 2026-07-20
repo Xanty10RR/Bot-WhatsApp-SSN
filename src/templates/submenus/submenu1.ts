@@ -2,12 +2,9 @@ import { ConvenioService } from "../../services/convenio.service";
 import { formatearBusqueda } from "../../utils/formatearBusqueda";
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
-import XLSX from "xlsx";
 import { fileURLToPath } from "url";
-import { dirname, resolve } from "path";
+import { dirname } from "path";
 import { mainFlow } from "../mainFlow";
-import { createReadStream } from "fs";
-import { existsSync } from "fs";
 
 const mostrarMenuOpciones = async (flowDynamic: any) => {
   await flowDynamic([
