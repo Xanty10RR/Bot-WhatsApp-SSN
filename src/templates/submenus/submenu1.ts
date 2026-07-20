@@ -1,3 +1,5 @@
+import { ConvenioService } from "../../services/convenio.service";
+import { formatearBusqueda } from "../../utils/formatearBusqueda";
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
 import XLSX from 'xlsx';
