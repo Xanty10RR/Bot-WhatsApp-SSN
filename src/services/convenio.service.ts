@@ -1,15 +1,12 @@
 import { pool } from "../provider/database";
 
 export class ConvenioService {
+  static async buscar(texto: string) {
+    const termino = `%${texto.toLowerCase()}%`;
 
-    static async buscar(texto: string) {
-
-        const termino = `%${texto.toLowerCase()}%`;
-
-        const [bbva, agrario, aval] = await Promise.all([
-
-            pool.query(
-                `
+    const [bbva, agrario, aval] = await Promise.all([
+      pool.query(
+        `
                 SELECT
                     'BBVA' AS banco,
                     codigo_convenio,
@@ -20,11 +17,11 @@ export class ConvenioService {
                     LOWER(nombre_convenio) LIKE $1
                     OR LOWER(nit) LIKE $1
                 `,
-                [termino]
-            ),
+        [termino],
+      ),
 
-            pool.query(
-                `
+      pool.query(
+        `
                 SELECT
                     'AGRARIO' AS banco,
                     codigo_convenio,
@@ -35,11 +32,11 @@ export class ConvenioService {
                     LOWER(nombre_convenio) LIKE $1
                     OR LOWER(nit_convenio) LIKE $1
                 `,
-                [termino]
-            ),
+        [termino],
+      ),
 
-            pool.query(
-                `
+      pool.query(
+        `
                 SELECT
                     'AVAL' AS banco,
                     convenio AS nombre_convenio,
@@ -53,16 +50,16 @@ export class ConvenioService {
                     OR LOWER(sigla) LIKE $1
                     OR LOWER(nit) LIKE $1
                 `,
-                [termino]
-            )
+        [termino],
+      ),
+    ]);
 
-        ]);
+    return {
+      total: bbva.rows.length + agrario.rows.length + aval.rows.length,
 
-        return {
-            bbva: bbva.rows,
-            agrario: agrario.rows,
-            aval: aval.rows
-        };
-    }
-
+      bbva: bbva.rows,
+      agrario: agrario.rows,
+      aval: aval.rows,
+    };
+  }
 }
