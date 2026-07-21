@@ -32,11 +32,14 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         }
 
         if (coincidencias.length === 1) {
-            await flowDynamic(
-                formatearBusqueda(texto, resultado)
-            );
-            return;
-        }
+
+        const respuesta = formatearConvenio(coincidencias[0]);
+
+        await flowDynamic(respuesta);
+
+        delete memory[ctx.from];flowDynamic
+        return;
+}
 
         // Guardamos resultados
         memory[ctx.from] = coincidencias;
@@ -88,6 +91,8 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         const respuesta = formatearConvenio(convenio);
 
         await flowDynamic(respuesta);
+
+        delete memory[ctx.from];
 
     }
 );
