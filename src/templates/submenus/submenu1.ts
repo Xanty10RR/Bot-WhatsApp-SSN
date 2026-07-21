@@ -2,6 +2,7 @@ import { ConvenioService } from "../../services/convenio.service";
 import { formatearBusqueda } from "../../utils/formatearBusqueda";
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
+import { formatearConvenio } from "../../utils/formatearConvenio";
 
 // Simple in-memory storage for search results per user (phone or id)
 const memory: Record<string, any[]> = {};
@@ -84,11 +85,9 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
         const convenio = lista[numero - 1];
 
-        await flowDynamic(
-            JSON.stringify(convenio, null, 2)
-        );
+        const respuesta = formatearConvenio(convenio);
 
-        delete memory[ctx.from];
+        await flowDynamic(respuesta);
 
     }
 );
