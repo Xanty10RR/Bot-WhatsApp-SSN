@@ -20,7 +20,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
     {
       capture: true,
     },
-    async (ctx, { flowDynamic }) => {
+    async (ctx, { flowDynamic, provider }) => {
       const texto = ctx.body.trim();
 
       const resultado = await ConvenioService.buscar(texto);
@@ -61,7 +61,11 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
       mensaje += "✍️ Escribe el número del convenio.";
 
-      await flowDynamic(mensaje);
+      const rows = coincidencias.map((item, index) => ({
+        id: `CONVENIO_${index}`,
+        title: item.nombre_convenio,
+        description: `${item.banco} • ${item.nit}`,
+      }));
     },
   )
 
