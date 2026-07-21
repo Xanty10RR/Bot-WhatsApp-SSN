@@ -23,7 +23,7 @@ ${convenio.tipo_referencia}
 📏 *Longitud:*
 ${convenio.longitud_referencia}
 
-📦 *Código barras:*
+📦 *Código de barras:*
 ${convenio.codigo_barras}
 
 ✍️ *Manual:*
@@ -35,8 +35,20 @@ ${convenio.manual}`;
 📋 *Convenio:*
 ${convenio.nombre_convenio}
 
+🔢 *Código:*
+${convenio.codigo_convenio}
+
 🆔 *NIT:*
-${convenio.nit}`;
+${convenio.nit}
+
+📂 *Categoría:*
+${convenio.categoria}
+
+🛰️ *Tipo captura:*
+${convenio.tipo_captura}
+
+📄 *Referencias:*
+${convenio.referencias}`;
 
         case "AVAL":
             return `🏦 *BANCO DE OCCIDENTE*
@@ -48,9 +60,22 @@ ${convenio.empresa}
 ${convenio.nombre_convenio}
 
 🆔 *NIT:*
-${convenio.nit}`;
+${convenio.nit}
+
+🏷️ *Sigla:*
+${convenio.sigla}
+
+🖥️ *Modalidad:*
+${convenio.modalidad}
+
+⌨️ *Dato captura:*
+${convenio.dato_captura}
+
+📝 *Descripción recaudo:*
+${convenio.descripcion_recaudo}`;
 
         default:
             return "❌ Convenio no encontrado.";
     }
+
 }
