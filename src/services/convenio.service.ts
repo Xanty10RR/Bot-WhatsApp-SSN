@@ -7,56 +7,66 @@ export class ConvenioService {
     const [bbva, agrario, aval] = await Promise.all([
       pool.query(
         `
-                SELECT
-                    'BBVA' AS banco,
-                    codigo_convenio,
-                    nombre_convenio,
-                    nit
-                FROM bbva
-                WHERE
-                    LOWER(nombre_convenio) LIKE $1
-                    OR LOWER(nit) LIKE $1
-                `,
-        [termino],
+        SELECT
+          'BBVA' AS banco,
+          codigo_convenio,
+          nombre_convenio,
+          nit,
+          categoria,
+          tipo_captura,
+          referencias
+        FROM bbva
+        WHERE
+          LOWER(nombre_convenio) LIKE $1
+          OR LOWER(nit) LIKE $1
+        `,
+        [termino]
       ),
 
       pool.query(
         `
-                SELECT
-                    'AGRARIO' AS banco,
-                    codigo_convenio,
-                    nombre_convenio,
-                    nit_convenio AS nit
-                FROM agrario
-                WHERE
-                    LOWER(nombre_convenio) LIKE $1
-                    OR LOWER(nit_convenio) LIKE $1
-                `,
-        [termino],
+        SELECT
+          'AGRARIO' AS banco,
+          codigo_convenio,
+          nombre_convenio,
+          nit_convenio AS nit,
+          referencia,
+          tipo_referencia,
+          longitud_referencia,
+          codigo_barras,
+          manual
+        FROM agrario
+        WHERE
+          LOWER(nombre_convenio) LIKE $1
+          OR LOWER(nit_convenio) LIKE $1
+        `,
+        [termino]
       ),
 
       pool.query(
         `
-                SELECT
-                    'AVAL' AS banco,
-                    convenio AS nombre_convenio,
-                    nit,
-                    empresa,
-                    sigla
-                FROM aval
-                WHERE
-                    LOWER(convenio) LIKE $1
-                    OR LOWER(empresa) LIKE $1
-                    OR LOWER(sigla) LIKE $1
-                    OR LOWER(nit) LIKE $1
-                `,
-        [termino],
+        SELECT
+          'AVAL' AS banco,
+          convenio AS nombre_convenio,
+          nit,
+          empresa,
+          sigla,
+          modalidad,
+          dato_captura,
+          descripcion_recaudo
+        FROM aval
+        WHERE
+          LOWER(convenio) LIKE $1
+          OR LOWER(empresa) LIKE $1
+          OR LOWER(sigla) LIKE $1
+          OR LOWER(nit) LIKE $1
+        `,
+        [termino]
       ),
     ]);
 
     return {
       total: bbva.rows.length + agrario.rows.length + aval.rows.length,
-
       bbva: bbva.rows,
       agrario: agrario.rows,
       aval: aval.rows,
