@@ -3,6 +3,13 @@ import { formatearBusqueda } from "../../utils/formatearBusqueda";
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
 import { formatearConvenio } from "../../utils/formatearConvenio";
+import { existsSync } from "fs";
+import { resolve } from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Simple in-memory storage for search results per user (phone or id)
 const memory: Record<string, any[]> = {};
