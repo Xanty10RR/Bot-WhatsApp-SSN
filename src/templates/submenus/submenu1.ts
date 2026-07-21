@@ -15,91 +15,94 @@ const __dirname = dirname(__filename);
 const memory: Record<string, any[]> = {};
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
-
-.addAnswer(
+  .addAnswer(
     "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
     {
-        capture: true,
+      capture: true,
     },
     async (ctx, { flowDynamic }) => {
+      const texto = ctx.body.trim();
 
-        const texto = ctx.body.trim();
+      const resultado = await ConvenioService.buscar(texto);
 
-        const resultado = await ConvenioService.buscar(texto);
+      const coincidencias = [
+        ...resultado.bbva,
+        ...resultado.agrario,
+        ...resultado.aval,
+      ];
 
-        const coincidencias = [
-            ...resultado.bbva,
-            ...resultado.agrario,
-            ...resultado.aval,
-        ];
+      if (coincidencias.length === 0) {
+        await flowDynamic("❌ No encontré coincidencias.");
+        return;
+      }
 
-        if (coincidencias.length === 0) {
-            await flowDynamic("❌ No encontré coincidencias.");
-            return;
-        }
-
-        if (coincidencias.length === 1) {
-
+      if (coincidencias.length === 1) {
         const respuesta = formatearConvenio(coincidencias[0]);
 
         await flowDynamic(respuesta);
 
-        delete memory[ctx.from];flowDynamic
+        delete memory[ctx.from];
+        flowDynamic;
         return;
-}
+      }
 
-        // Guardamos resultados
-        memory[ctx.from] = coincidencias;
+      // Guardamos resultados
+      memory[ctx.from] = coincidencias;
 
-        let mensaje =
-            `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
+      let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
 
-        coincidencias.forEach((item, index) => {
+      coincidencias.forEach((item, index) => {
+        mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
+        mensaje += `🏦 ${item.banco}\n\n`;
+      });
 
-            mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
-            mensaje += `🏦 ${item.banco}\n\n`;
+      mensaje += "✍️ Escribe el número del convenio.";
 
-        });
+      await flowDynamic(mensaje);
+    },
+  )
 
-        mensaje += "✍️ Escribe el número del convenio.";
-
-        await flowDynamic(mensaje);
-
-    }
-)
-
-.addAnswer(
+  .addAnswer(
     "",
     {
-        capture: true,
+      capture: true,
     },
     async (ctx, { flowDynamic }) => {
+      const lista = memory[ctx.from];
 
-        const lista = memory[ctx.from];
+      if (!lista) {
+        await flowDynamic("⚠️ La búsqueda expiró.");
+        return;
+      }
 
-        if (!lista) {
-            await flowDynamic("⚠️ La búsqueda expiró.");
-            return;
+      const numero = parseInt(ctx.body);
+
+      if (isNaN(numero) || numero < 1 || numero > lista.length) {
+        await flowDynamic("❌ Número inválido.");
+        return;
+      }
+
+      const convenio = lista[numero - 1];
+
+      const respuesta = formatearConvenio(convenio);
+
+      await flowDynamic(respuesta);
+
+      const nit = convenio.nit;
+
+      if (nit) {
+        const imagePath = resolve(__dirname, "../../images", `${nit}.png`);
+
+        if (existsSync(imagePath)) {
+          await flowDynamic([
+            {
+              body: "🖼️ Imagen del convenio",
+              media: imagePath,
+            },
+          ]);
         }
+      }
 
-        const numero = parseInt(ctx.body);
-
-        if (
-            isNaN(numero) ||
-            numero < 1 ||
-            numero > lista.length
-        ) {
-            await flowDynamic("❌ Número inválido.");
-            return;
-        }
-
-        const convenio = lista[numero - 1];
-
-        const respuesta = formatearConvenio(convenio);
-
-        await flowDynamic(respuesta);
-
-        delete memory[ctx.from];
-
-    }
-);
+      delete memory[ctx.from];
+    },
+  );
