@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Simple in-memory storage for search results per user (phone or id)
-const memory: Record<string, any[]> = {};
+const memory: Record<string, { texto: string; coincidencias: any[] }> = {};
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   .addAnswer(
@@ -46,8 +46,11 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         return;
       }
 
-      // Guardamos resultados
-      memory[ctx.from] = coincidencias;
+      // Guardamos resultados como un objeto en memoria para el usuario
+      memory[ctx.from] = {
+        texto,
+        coincidencias,
+      };
 
       let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
 
@@ -68,7 +71,14 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       capture: true,
     },
     async (ctx, { flowDynamic }) => {
-      const lista = memory[ctx.from];
+      const datos = memory[ctx.from];
+
+      if (!datos) {
+        await flowDynamic("⚠️ La búsqueda expiró.");
+        return;
+      }
+
+      const lista = datos.coincidencias;
 
       if (!lista) {
         await flowDynamic("⚠️ La búsqueda expiró.");
