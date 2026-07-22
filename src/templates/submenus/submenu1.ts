@@ -11,6 +11,21 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const mostrarMenu = async (flowDynamic: any) => {
+  await flowDynamic(`
+
+━━━━━━━━━━━━━━
+
+🔄 Escribe *buscar* para hacer otra consulta.
+
+🏠 Escribe *menu* para volver al inicio.
+
+📞 Escribe *soporte* para hablar con soporte.
+
+━━━━━━━━━━━━━━
+`);
+};
+
 // Simple in-memory storage for search results per user (phone or id)
 const memory: Record<string, { texto: string; coincidencias: any[] }> = {};
 
@@ -112,5 +127,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       }
 
       delete memory[ctx.from];
+
+      await mostrarMenu(flowDynamic);
     },
   );
