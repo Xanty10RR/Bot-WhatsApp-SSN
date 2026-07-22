@@ -1,6 +1,12 @@
+export interface ResultadoMemoria {
+    banco: string;
+    id: string;
+    nombre: string;
+}
+
 export interface MemoryData {
     texto: string;
-    coincidencias: any[];
+    resultados: ResultadoMemoria[];
     sugerencia?: string;
 }
 
