@@ -136,6 +136,8 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
       const respuestaUsuario = ctx.body.trim().toUpperCase();
 
+      console.log("BOTÓN:", ctx.body);
+
       if (
         respuestaUsuario === "SÍ" ||
         respuestaUsuario === "SI" ||
