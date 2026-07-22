@@ -47,7 +47,31 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       ];
 
       if (coincidencias.length === 0) {
+        const sugerencia = await ConvenioService.sugerir(texto);
+
+        if (sugerencia && sugerencia.score >= 0.45) {
+          await flowDynamic(
+            `
+            ❌ No encontré coincidencias.
+
+            🤔 ¿Quisiste decir?
+
+            ✅ ${sugerencia.nombre_convenio}
+
+            Escribe *SI* para buscar ese convenio o *NO* para intentar nuevamente.
+            `,
+          );
+
+          memory[ctx.from] = {
+            texto: sugerencia.nombre_convenio,
+            coincidencias: [],
+          };
+
+          return;
+        }
+
         await flowDynamic("❌ No encontré coincidencias.");
+
         return;
       }
 
