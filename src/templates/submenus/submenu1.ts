@@ -124,6 +124,58 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
       const numero = parseInt(ctx.body);
 
+      const respuestaUsuario = ctx.body.trim().toUpperCase();
+
+      if (respuestaUsuario === "SI") {
+        const sugerencia = memory[ctx.from];
+
+        if (!sugerencia) {
+          await flowDynamic("⚠️ La sugerencia expiró.");
+          return;
+        }
+
+        const nuevoResultado = await ConvenioService.buscar(sugerencia.texto);
+
+        const nuevasCoincidencias = [
+          ...nuevoResultado.bbva,
+          ...nuevoResultado.agrario,
+          ...nuevoResultado.aval,
+        ];
+
+        if (nuevasCoincidencias.length === 1) {
+          await flowDynamic(formatearConvenio(nuevasCoincidencias[0]));
+
+          delete memory[ctx.from];
+          return;
+        }
+
+        memory[ctx.from] = {
+          texto: sugerencia.texto,
+          coincidencias: nuevasCoincidencias,
+        };
+
+        let mensaje = `🔎 Encontré *${nuevasCoincidencias.length}* coincidencias.\n\n`;
+
+        nuevasCoincidencias.forEach((item, index) => {
+          mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
+          mensaje += `🏦 ${item.banco}\n\n`;
+        });
+
+        mensaje += "✍️ Escribe el número del convenio.";
+
+        await flowDynamic(mensaje);
+
+        return;
+      }
+
+      if (respuestaUsuario === "NO") {
+        delete memory[ctx.from];
+
+        await flowDynamic("✍️ Escribe nuevamente el nombre del convenio.");
+
+        return;
+      }
+
       if (isNaN(numero) || numero < 1 || numero > lista.length) {
         await flowDynamic("❌ Número inválido.");
         return;
