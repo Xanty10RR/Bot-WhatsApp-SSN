@@ -20,7 +20,7 @@ export class ConvenioService {
           LOWER(nombre_convenio) LIKE $1
           OR LOWER(nit) LIKE $1
         `,
-        [termino]
+        [termino],
       ),
 
       pool.query(
@@ -40,7 +40,7 @@ export class ConvenioService {
           LOWER(nombre_convenio) LIKE $1
           OR LOWER(nit_convenio) LIKE $1
         `,
-        [termino]
+        [termino],
       ),
 
       pool.query(
@@ -61,7 +61,7 @@ export class ConvenioService {
           OR LOWER(sigla) LIKE $1
           OR LOWER(nit) LIKE $1
         `,
-        [termino]
+        [termino],
       ),
     ]);
 
@@ -71,5 +71,53 @@ export class ConvenioService {
       agrario: agrario.rows,
       aval: aval.rows,
     };
+  }
+
+  static async sugerir(texto: string) {
+    const [bbva, agrario, aval] = await Promise.all([
+      pool.query(
+        `
+            SELECT
+                nombre_convenio,
+                similarity(lower(nombre_convenio), lower($1)) AS score
+            FROM bbva
+            ORDER BY score DESC
+            LIMIT 1
+            `,
+        [texto],
+      ),
+
+      pool.query(
+        `
+            SELECT
+                nombre_convenio,
+                similarity(lower(nombre_convenio), lower($1)) AS score
+            FROM agrario
+            ORDER BY score DESC
+            LIMIT 1
+            `,
+        [texto],
+      ),
+
+      pool.query(
+        `
+            SELECT
+                convenio AS nombre_convenio,
+                similarity(lower(convenio), lower($1)) AS score
+            FROM aval
+            ORDER BY score DESC
+            LIMIT 1
+            `,
+        [texto],
+      ),
+    ]);
+
+    const candidatos = [bbva.rows[0], agrario.rows[0], aval.rows[0]].filter(
+      Boolean,
+    );
+
+    candidatos.sort((a, b) => b.score - a.score);
+
+    return candidatos[0] ?? null;
   }
 }
