@@ -113,8 +113,10 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
       const nit = convenio.nit;
 
-      if (nit) {
-        const imagePath = resolve(__dirname, "../../images", `${nit}.png`);
+      const extensiones = ["png", "jpg", "jpeg"];
+
+      for (const ext of extensiones) {
+        const imagePath = resolve(__dirname, "images", `${nit}.${ext}`);
 
         if (existsSync(imagePath)) {
           await flowDynamic([
@@ -123,6 +125,8 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
               media: imagePath,
             },
           ]);
+
+          break;
         }
       }
 
