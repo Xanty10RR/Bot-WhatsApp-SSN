@@ -1,3 +1,4 @@
+/*
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { ConvenioService } from "../../services/convenio.service";
 import { formatearConvenio } from "../../utils/formatearConvenio";
@@ -10,9 +11,13 @@ export const buscarFlow = addKeyword(EVENTS.ACTION).addAnswer(
   {
     capture: true,
   },
+
   async (ctx, { flowDynamic, gotoFlow }) => {
 
-    const texto = ctx.body.trim();
+  console.log("ENTRÓ A BUSCARFLOW");
+  console.log(ctx.body);
+
+  const texto = ctx.body.trim();
 
     const resultado = await ConvenioService.buscar(texto);
 
@@ -88,3 +93,4 @@ export const buscarFlow = addKeyword(EVENTS.ACTION).addAnswer(
 
   }
 );
+*/

@@ -1,4 +1,4 @@
-import { addKeyword } from "@builderbot/bot";
+/*import { addKeyword } from "@builderbot/bot";
 import { ConvenioService } from "../../services/convenio.service";
 import { memory } from "./memory";
 import { seleccionarConvenioFlow } from "./seleccionarConvenioFlow";
@@ -102,4 +102,4 @@ Responde:
     await flowDynamic("❌ Responde SI o NO.");
 
   }
-);
+);*/

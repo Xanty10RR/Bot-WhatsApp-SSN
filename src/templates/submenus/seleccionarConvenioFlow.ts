@@ -1,4 +1,4 @@
-import { addKeyword } from "@builderbot/bot";
+/*import { addKeyword } from "@builderbot/bot";
 import { existsSync } from "fs";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
@@ -102,3 +102,4 @@ export const seleccionarConvenioFlow = addKeyword("__SELECCIONAR__").addAnswer(
 
   }
 );
+*/
