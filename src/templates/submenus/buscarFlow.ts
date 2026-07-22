@@ -1,11 +1,11 @@
-import { addKeyword } from "@builderbot/bot";
+import { addKeyword, EVENTS } from "@builderbot/bot";
 import { ConvenioService } from "../../services/convenio.service";
 import { formatearConvenio } from "../../utils/formatearConvenio";
 import { memory } from "./memory";
 import { seleccionarConvenioFlow } from "./seleccionarConvenioFlow";
 import { sugerenciaFlow } from "./sugerenciaFlow";
 
-export const buscarFlow = addKeyword("__BUSCAR__").addAnswer(
+export const buscarFlow = addKeyword(EVENTS.ACTION).addAnswer(
   "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
   {
     capture: true,
