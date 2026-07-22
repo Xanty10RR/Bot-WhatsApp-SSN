@@ -41,8 +41,6 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
         await flowDynamic(respuesta);
 
-        delete memory[ctx.from];
-        flowDynamic;
         return;
       }
 
