@@ -35,7 +35,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
     {
       capture: true,
     },
-    async (ctx, { flowDynamic }) => {
+    async (ctx, { flowDynamic, provider }) => {
       const texto = ctx.body.trim();
 
       const resultado = await ConvenioService.buscar(texto);
@@ -49,17 +49,23 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       if (coincidencias.length === 0) {
         const sugerencia = await ConvenioService.sugerir(texto);
 
-        if (sugerencia && sugerencia.score >= 0.45) {
-          await flowDynamic(
-            `
-            ❌ No encontré coincidencias.
+        console.log("SUGERENCIA:");
+        console.dir(sugerencia, { depth: null });
 
-            🤔 ¿Quisiste decir?
-
-            ✅ ${sugerencia.nombre_convenio}
-
-            Escribe *SI* para buscar ese convenio o *NO* para intentar nuevamente.
-            `,
+        if (sugerencia && sugerencia.score >= 0.25) {
+          await provider.sendButtons(
+            ctx.from,
+            [
+              {
+                body: "✅ Sí",
+                id: "SUGERENCIA_SI",
+              },
+              {
+                body: "❌ No",
+                id: "SUGERENCIA_NO",
+              },
+            ],
+            `🤔 ¿Quisiste decir *${sugerencia.nombre_convenio}*?`,
           );
 
           memory[ctx.from] = {
@@ -107,7 +113,11 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
     {
       capture: true,
     },
+
     async (ctx, { flowDynamic }) => {
+      console.log("CTX COMPLETO");
+      console.dir(ctx, { depth: null });
+
       const datos = memory[ctx.from];
 
       if (!datos) {
@@ -126,7 +136,11 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
       const respuestaUsuario = ctx.body.trim().toUpperCase();
 
-      if (respuestaUsuario === "SI") {
+      if (
+        respuestaUsuario === "SÍ" ||
+        respuestaUsuario === "SI" ||
+        respuestaUsuario === "✅ SÍ"
+      ) {
         const sugerencia = memory[ctx.from];
 
         if (!sugerencia) {
@@ -168,7 +182,10 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         return;
       }
 
-      if (respuestaUsuario === "NO") {
+      if (
+        respuestaUsuario === "NO" || 
+        respuestaUsuario === "❌ NO"
+      ) {
         delete memory[ctx.from];
 
         await flowDynamic("✍️ Escribe nuevamente el nombre del convenio.");
