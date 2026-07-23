@@ -1,4 +1,4 @@
-export interface ResultadoMemoria {
+/*export interface ResultadoMemoria {
     banco: string;
     id: string;
     nombre: string;
@@ -10,4 +10,4 @@ export interface MemoryData {
     sugerencia?: string;
 }
 
-export const memory: Record<string, MemoryData> = {};
+export const memory: Record<string, MemoryData> = {};*/

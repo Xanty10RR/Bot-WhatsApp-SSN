@@ -30,7 +30,7 @@ ${convenio.codigo_barras}
 ${convenio.manual}`;
 
         case "BBVA":
-            return `🏦 *BBVA*
+            return `🏦 *BANCO BBVA*
 
 📋 *Convenio:*
 ${convenio.nombre_convenio}
@@ -51,7 +51,7 @@ ${convenio.tipo_captura}
 ${convenio.referencias}`;
 
         case "AVAL":
-            return `🏦 *BANCO DE OCCIDENTE*
+            return `🏦 *BANCO AVAL*
 
 🏢 *Empresa:*
 ${convenio.empresa}
