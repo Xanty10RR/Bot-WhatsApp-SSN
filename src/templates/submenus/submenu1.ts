@@ -99,7 +99,11 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
       const convenio = lista[numero - 1];
 
-      await flowDynamic(JSON.stringify(convenio, null, 2));
+      await flowDynamic(formatearConvenio(convenio));
+
+      await mostrarMenu(flowDynamic);
+
+      delete memory[ctx.from];
 
       delete memory[ctx.from];
     },
