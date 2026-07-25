@@ -30,88 +30,77 @@ const mostrarMenu = async (flowDynamic: any) => {
 const memory: Record<string, any[]> = {};
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
-
-.addAnswer(
+  .addAnswer(
     "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
     {
-        capture: true,
+      capture: true,
     },
     async (ctx, { flowDynamic }) => {
+      const texto = ctx.body.trim();
 
-        const texto = ctx.body.trim();
+      const resultado = await ConvenioService.buscar(texto);
 
-        const resultado = await ConvenioService.buscar(texto);
+      const coincidencias = [
+        ...resultado.bbva,
+        ...resultado.agrario,
+        ...resultado.aval,
+      ];
 
-        const coincidencias = [
-            ...resultado.bbva,
-            ...resultado.agrario,
-            ...resultado.aval,
-        ];
+      if (coincidencias.length === 0) {
+        await flowDynamic("❌ No encontré coincidencias.");
+        return;
+      }
 
-        if (coincidencias.length === 0) {
-            await flowDynamic("❌ No encontré coincidencias.");
-            return;
-        }
+      if (coincidencias.length === 1) {
+        const convenio = coincidencias[0];
 
-        if (coincidencias.length === 1) {
-            await flowDynamic(
-                formatearBusqueda(texto, resultado)
-            );
-            return;
-        }
+        await flowDynamic(formatearConvenio(convenio));
 
-        // Guardamos resultados
-        memory[ctx.from] = coincidencias;
+        await mostrarMenu(flowDynamic);
 
-        let mensaje =
-            `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
+        return;
+      }
 
-        coincidencias.forEach((item, index) => {
+      // Guardamos resultados
+      memory[ctx.from] = coincidencias;
 
-            mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
-            mensaje += `🏦 ${item.banco}\n\n`;
+      let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
 
-        });
+      coincidencias.forEach((item, index) => {
+        mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
+        mensaje += `🏦 ${item.banco}\n\n`;
+      });
 
-        mensaje += "✍️ Escribe el número del convenio.";
+      mensaje += "✍️ Escribe el número del convenio.";
 
-        await flowDynamic(mensaje);
+      await flowDynamic(mensaje);
+    },
+  )
 
-    }
-)
-
-.addAnswer(
+  .addAnswer(
     "",
     {
-        capture: true,
+      capture: true,
     },
     async (ctx, { flowDynamic }) => {
+      const lista = memory[ctx.from];
 
-        const lista = memory[ctx.from];
+      if (!lista) {
+        await flowDynamic("⚠️ La búsqueda expiró.");
+        return;
+      }
 
-        if (!lista) {
-            await flowDynamic("⚠️ La búsqueda expiró.");
-            return;
-        }
+      const numero = parseInt(ctx.body);
 
-        const numero = parseInt(ctx.body);
+      if (isNaN(numero) || numero < 1 || numero > lista.length) {
+        await flowDynamic("❌ Número inválido.");
+        return;
+      }
 
-        if (
-            isNaN(numero) ||
-            numero < 1 ||
-            numero > lista.length
-        ) {
-            await flowDynamic("❌ Número inválido.");
-            return;
-        }
+      const convenio = lista[numero - 1];
 
-        const convenio = lista[numero - 1];
+      await flowDynamic(JSON.stringify(convenio, null, 2));
 
-        await flowDynamic(
-            JSON.stringify(convenio, null, 2)
-        );
-
-        delete memory[ctx.from];
-
-    }
-);
+      delete memory[ctx.from];
+    },
+  );
