@@ -129,13 +129,11 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
             }
 
             if (opcion === "soporte") {
-                await flowDynamic(`
-                    📞 *Soporte Técnico*
-                    📱 323493779           
-                    🕗 Lunes a Viernes
-                    7:00 a.m. - 12:00 p.m.
-                    12:00 p.m. - 6:00 p.m.
-                    `);
+                await flowDynamic(`📞 *Soporte Técnico*
+                📱 323493779           
+                🕗 Lunes a Viernes
+                7:00 a.m. - 12:00 p.m.
+                12:00 p.m. - 6:00 p.m.`);
                     return;
             }
 
