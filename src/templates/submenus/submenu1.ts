@@ -105,6 +105,36 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
       delete memory[ctx.from];
 
-      delete memory[ctx.from];
+      // Next step: ask user if they want to search again, go to menu or contact support
+    },
+  )
+
+  .addAnswer(
+    "",
+    {
+      capture: true,
+    },
+    async (ctx: any, { gotoFlow, flowDynamic }: any) => {
+      const opcion = ctx.body.trim().toLowerCase();
+
+      if (opcion === "buscar") {
+        delete memory[ctx.from];
+        return gotoFlow(submenu1Flow);
+      }
+
+      if (opcion === "menu") {
+        delete memory[ctx.from];
+        await flowDynamic("🏠 Volviendo al inicio.");
+        return;
+      }
+
+      if (opcion === "soporte") {
+        await flowDynamic(
+          "📞 Soporte\n\n323493779\nLunes a Viernes\n8:00 a.m. - 6:00 p.m."
+        );
+        return;
+      }
+
+      await flowDynamic("❌ Escribe: buscar, menu o soporte.");
     },
   );
