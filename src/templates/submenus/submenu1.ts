@@ -1,6 +1,6 @@
 import { ConvenioService } from "../../services/convenio.service";
-import { formatearBusqueda } from "../../utils/formatearBusqueda";
 import { addKeyword } from "@builderbot/bot";
+import { mainFlow } from "../mainFlow";
 import { MENU_IDS } from "../constants";
 import { formatearConvenio } from "../../utils/formatearConvenio";
 import { existsSync } from "fs";
@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const mostrarMenu = async (flowDynamic: any) => {
-  await flowDynamic(`
+    await flowDynamic(`
 
 ━━━━━━━━━━━━━━
 
@@ -26,115 +26,121 @@ const mostrarMenu = async (flowDynamic: any) => {
 `);
 };
 
-// Simple in-memory storage for search results per user (phone or id)
 const memory: Record<string, any[]> = {};
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
-  .addAnswer(
-    "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
-    {
-      capture: true,
-    },
-    async (ctx, { flowDynamic }) => {
-      const texto = ctx.body.trim();
+    // Pide, busca y muestra resultados de convenios
+    .addAnswer(
+        "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
+        {
+            capture: true,
+        },
+        async (ctx, { flowDynamic }) => {
+            const texto = ctx.body.trim();
 
-      const resultado = await ConvenioService.buscar(texto);
+            const resultado = await ConvenioService.buscar(texto);
 
-      const coincidencias = [
-        ...resultado.bbva,
-        ...resultado.agrario,
-        ...resultado.aval,
-      ];
+            const coincidencias = [
+                ...resultado.bbva,
+                ...resultado.agrario,
+                ...resultado.aval,
+            ];
 
-      if (coincidencias.length === 0) {
-        await flowDynamic("❌ No encontré coincidencias.");
-        return;
-      }
+            if (coincidencias.length === 0) {
+                await flowDynamic("❌ No encontré coincidencias.");
+                return;
+            }
 
-      if (coincidencias.length === 1) {
-        const convenio = coincidencias[0];
+            if (coincidencias.length === 1) {
+                const convenio = coincidencias[0];
 
-        await flowDynamic(formatearConvenio(convenio));
+                await flowDynamic(formatearConvenio(convenio));
 
-        await mostrarMenu(flowDynamic);
+                await mostrarMenu(flowDynamic);
 
-        return;
-      }
+                return;
+            }
 
-      // Guardamos resultados
-      memory[ctx.from] = coincidencias;
+            // Guardamos resultados
+            memory[ctx.from] = coincidencias;
 
-      let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
+            let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
 
-      coincidencias.forEach((item, index) => {
-        mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
-        mensaje += `🏦 ${item.banco}\n\n`;
-      });
+            coincidencias.forEach((item, index) => {
+                mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
+                mensaje += `🏦 ${item.banco}\n\n`;
+            });
 
-      mensaje += "✍️ Escribe el número del convenio.";
+            mensaje += "✍️ Escribe el número del convenio.";
 
-      await flowDynamic(mensaje);
-    },
-  )
+            await flowDynamic(mensaje);
+        },
+    )
 
-  .addAnswer(
-    "",
-    {
-      capture: true,
-    },
-    async (ctx, { flowDynamic }) => {
-      const lista = memory[ctx.from];
+    // Se ejecuta solo cuando había varias coincidencias lee, valida, muestra convenio y menu
+    .addAnswer(
+        "",
+        {
+            capture: true,
+        },
+        async (ctx, { flowDynamic }) => {
+            const lista = memory[ctx.from];
 
-      if (!lista) {
-        await flowDynamic("⚠️ La búsqueda expiró.");
-        return;
-      }
+            if (!lista) {
+                await flowDynamic("⚠️ La búsqueda expiró.");
+                return;
+            }
 
-      const numero = parseInt(ctx.body);
+            const numero = parseInt(ctx.body);
 
-      if (isNaN(numero) || numero < 1 || numero > lista.length) {
-        await flowDynamic("❌ Número inválido.");
-        return;
-      }
+            if (isNaN(numero) || numero < 1 || numero > lista.length) {
+                await flowDynamic("❌ Número inválido.");
+                return;
+            }
 
-      const convenio = lista[numero - 1];
+            const convenio = lista[numero - 1];
 
-      await flowDynamic(formatearConvenio(convenio));
+            await flowDynamic(formatearConvenio(convenio));
 
-      await mostrarMenu(flowDynamic);
+            delete memory[ctx.from];
 
-      delete memory[ctx.from];
+            await mostrarMenu(flowDynamic);
+            // Next step: ask user if they want to search again, go to menu or contact support
+        },
+    )
 
-      // Next step: ask user if they want to search again, go to menu or contact support
-    },
-  )
+    // Se ejecuta después de mostrar el convenio y el menu, valida la opción y redirige
+    .addAnswer(
+        "",
+        {
+            capture: true,
+        },
+        async (ctx, { flowDynamic, gotoFlow }) => {
+            const opcion = ctx.body.trim().toLowerCase();
 
-  .addAnswer(
-    "",
-    {
-      capture: true,
-    },
-    async (ctx: any, { gotoFlow, flowDynamic }: any) => {
-      const opcion = ctx.body.trim().toLowerCase();
+            if (opcion === "buscar") {
+                delete memory[ctx.from];
+                return gotoFlow(submenu1Flow);
+            }
 
-      if (opcion === "buscar") {
-        delete memory[ctx.from];
-        return gotoFlow(submenu1Flow);
-      }
+            if (opcion === "menu") {
+                delete memory[ctx.from];
+                return gotoFlow(mainFlow);
+            }
 
-      if (opcion === "menu") {
-        delete memory[ctx.from];
-        await flowDynamic("🏠 Volviendo al inicio.");
-        return;
-      }
+            if (opcion === "soporte") {
+                await flowDynamic(`
+                    📞 *Soporte Técnico*
+                    📱 323493779           
+                    🕗 Lunes a Viernes
+                    7:00 a.m. - 12:00 p.m.
+                    12:00 p.m. - 6:00 p.m.
+                    `);
+                    return;
+            }
 
-      if (opcion === "soporte") {
-        await flowDynamic(
-          "📞 Soporte\n\n323493779\nLunes a Viernes\n8:00 a.m. - 6:00 p.m."
-        );
-        return;
-      }
-
-      await flowDynamic("❌ Escribe: buscar, menu o soporte.");
-    },
-  );
+            await flowDynamic(
+                "❌ Opción no válida.\n\nEscribe *buscar*, *menu* o *soporte*.",
+            );
+        },
+    );
