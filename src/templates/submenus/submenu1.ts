@@ -87,6 +87,21 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
 
         await flowDynamic(formatearConvenio(convenio));
 
+        const rutaImagen = resolve(
+          __dirname,
+          "images",
+          `${convenio.codigo_convenio}.png`,
+        );
+
+        if (existsSync(rutaImagen)) {
+          await flowDynamic([
+            {
+              body: "📷 *Instructivo para realizar el recaudo de este convenio.*",
+              media: rutaImagen,
+            },
+          ]);
+        }
+
         await mostrarMenu(flowDynamic);
 
         return;
@@ -109,9 +124,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   )
 
   // Se ejecuta solo cuando había varias coincidencias lee, valida, muestra convenio y menu
-  .addAction(
-    { capture: true }, 
-    async (ctx, { flowDynamic }) => {
+  .addAction({ capture: true }, async (ctx, { flowDynamic }) => {
     const lista = memory[ctx.from];
 
     if (!lista) {
