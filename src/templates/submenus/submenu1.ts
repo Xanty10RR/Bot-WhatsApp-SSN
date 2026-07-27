@@ -128,7 +128,6 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
     const lista = memory[ctx.from];
 
     if (!lista) {
-      await flowDynamic("⚠️ La búsqueda expiró.");
       return;
     }
 
