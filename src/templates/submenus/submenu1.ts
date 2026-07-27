@@ -109,36 +109,32 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   )
 
   // Se ejecuta solo cuando había varias coincidencias lee, valida, muestra convenio y menu
-  .addAnswer(
-    "",
-    {
-      capture: true,
-    },
+  .addAction(
+    { capture: true }, 
     async (ctx, { flowDynamic }) => {
-      const lista = memory[ctx.from];
+    const lista = memory[ctx.from];
 
-      if (!lista) {
-        await flowDynamic("⚠️ La búsqueda expiró.");
-        return;
-      }
+    if (!lista) {
+      await flowDynamic("⚠️ La búsqueda expiró.");
+      return;
+    }
 
-      const numero = parseInt(ctx.body);
+    const numero = parseInt(ctx.body);
 
-      if (isNaN(numero) || numero < 1 || numero > lista.length) {
-        await flowDynamic("❌ Número inválido.");
-        return;
-      }
+    if (isNaN(numero) || numero < 1 || numero > lista.length) {
+      await flowDynamic("❌ Número inválido.");
+      return;
+    }
 
-      const convenio = lista[numero - 1];
+    const convenio = lista[numero - 1];
 
-      await flowDynamic(formatearConvenio(convenio));
+    await flowDynamic(formatearConvenio(convenio));
 
-      delete memory[ctx.from];
+    delete memory[ctx.from];
 
-      await mostrarMenu(flowDynamic);
-      // Next step: ask user if they want to search again, go to menu or contact support
-    },
-  )
+    await mostrarMenu(flowDynamic);
+    // Next step: ask user if they want to search again, go to menu or contact support
+  })
 
   // Se ejecuta después de mostrar el convenio y el menu, valida la opción y redirige
   .addAnswer(
