@@ -37,7 +37,14 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       capture: true,
     },
     async (ctx, { flowDynamic }) => {
-      const texto = ctx.body.trim();
+      let texto = ctx.body.trim();
+
+      // Si el usuario respondió "si" y existe una sugerencia,
+      // usamos el convenio sugerido.
+      if (texto.toLowerCase() === "si" && sugerencias[ctx.from]) {
+        texto = sugerencias[ctx.from];
+        delete sugerencias[ctx.from];
+      }
 
       const resultado = await ConvenioService.buscar(texto);
 
