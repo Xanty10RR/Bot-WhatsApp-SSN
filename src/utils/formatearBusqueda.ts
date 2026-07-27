@@ -1,4 +1,4 @@
-const LIMITE = 10;
+/*const LIMITE = 10;
 
 type ResultadoBusqueda = {
   total: number;
@@ -62,4 +62,4 @@ export function formatearBusqueda(
   }
 
   return mensaje;
-}
+}*/
