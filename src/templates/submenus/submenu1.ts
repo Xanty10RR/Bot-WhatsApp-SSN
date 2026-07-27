@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const mostrarMenu = async (flowDynamic: any) => {
-    await flowDynamic(`
+  await flowDynamic(`
 
 ━━━━━━━━━━━━━━
 
@@ -27,118 +27,142 @@ const mostrarMenu = async (flowDynamic: any) => {
 };
 
 const memory: Record<string, any[]> = {};
+const sugerencias: Record<string, string> = {};
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
-    // Pide, busca y muestra resultados de convenios
-    .addAnswer(
-        "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
-        {
-            capture: true,
-        },
-        async (ctx, { flowDynamic }) => {
-            const texto = ctx.body.trim();
+  // Pide, busca y muestra resultados de convenios
+  .addAnswer(
+    "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
+    {
+      capture: true,
+    },
+    async (ctx, { flowDynamic }) => {
+      const texto = ctx.body.trim();
 
-            const resultado = await ConvenioService.buscar(texto);
+      const resultado = await ConvenioService.buscar(texto);
 
-            const coincidencias = [
-                ...resultado.bbva,
-                ...resultado.agrario,
-                ...resultado.aval,
-            ];
+      const coincidencias = [
+        ...resultado.bbva,
+        ...resultado.agrario,
+        ...resultado.aval,
+      ];
 
-            if (coincidencias.length === 0) {
-                await flowDynamic("❌ No encontré coincidencias.");
-                return;
-            }
+      if (coincidencias.length === 0) {
+        const sugerencia = await ConvenioService.sugerir(texto);
 
-            if (coincidencias.length === 1) {
-                const convenio = coincidencias[0];
+        if (sugerencia && sugerencia.score >= 0.35) {
+          sugerencias[ctx.from] = sugerencia.nombre_convenio;
 
-                await flowDynamic(formatearConvenio(convenio));
+          await flowDynamic(
+            `❌ No encontré coincidencias para:
 
-                await mostrarMenu(flowDynamic);
+"${texto}"
 
-                return;
-            }
+🤔 ¿Quisiste decir?
 
-            // Guardamos resultados
-            memory[ctx.from] = coincidencias;
+📋 *${sugerencia.nombre_convenio}*
 
-            let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
+✅ Escribe *si* para consultar este convenio.
 
-            coincidencias.forEach((item, index) => {
-                mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
-                mensaje += `🏦 ${item.banco}\n\n`;
-            });
+🔄 O escribe otro nombre para realizar una nueva búsqueda.`,
+          );
 
-            mensaje += "✍️ Escribe el número del convenio.";
+          return;
+        }
 
-            await flowDynamic(mensaje);
-        },
-    )
+        await flowDynamic("❌ No encontré coincidencias.");
 
-    // Se ejecuta solo cuando había varias coincidencias lee, valida, muestra convenio y menu
-    .addAnswer(
-        "",
-        {
-            capture: true,
-        },
-        async (ctx, { flowDynamic }) => {
-            const lista = memory[ctx.from];
+        return;
+      }
 
-            if (!lista) {
-                await flowDynamic("⚠️ La búsqueda expiró.");
-                return;
-            }
+      if (coincidencias.length === 1) {
+        const convenio = coincidencias[0];
 
-            const numero = parseInt(ctx.body);
+        await flowDynamic(formatearConvenio(convenio));
 
-            if (isNaN(numero) || numero < 1 || numero > lista.length) {
-                await flowDynamic("❌ Número inválido.");
-                return;
-            }
+        await mostrarMenu(flowDynamic);
 
-            const convenio = lista[numero - 1];
+        return;
+      }
 
-            await flowDynamic(formatearConvenio(convenio));
+      // Guardamos resultados
+      memory[ctx.from] = coincidencias;
 
-            delete memory[ctx.from];
+      let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
 
-            await mostrarMenu(flowDynamic);
-            // Next step: ask user if they want to search again, go to menu or contact support
-        },
-    )
+      coincidencias.forEach((item, index) => {
+        mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
+        mensaje += `🏦 ${item.banco}\n\n`;
+      });
 
-    // Se ejecuta después de mostrar el convenio y el menu, valida la opción y redirige
-    .addAnswer(
-        "",
-        {
-            capture: true,
-        },
-        async (ctx, { flowDynamic, gotoFlow }) => {
-            const opcion = ctx.body.trim().toLowerCase();
+      mensaje += "✍️ Escribe el número del convenio.";
 
-            if (opcion === "buscar") {
-                delete memory[ctx.from];
-                return gotoFlow(submenu1Flow);
-            }
+      await flowDynamic(mensaje);
+    },
+  )
 
-            if (opcion === "menu") {
-                delete memory[ctx.from];
-                return gotoFlow(mainFlow);
-            }
+  // Se ejecuta solo cuando había varias coincidencias lee, valida, muestra convenio y menu
+  .addAnswer(
+    "",
+    {
+      capture: true,
+    },
+    async (ctx, { flowDynamic }) => {
+      const lista = memory[ctx.from];
 
-            if (opcion === "soporte") {
-                await flowDynamic(`📞 *Soporte Técnico*
+      if (!lista) {
+        await flowDynamic("⚠️ La búsqueda expiró.");
+        return;
+      }
+
+      const numero = parseInt(ctx.body);
+
+      if (isNaN(numero) || numero < 1 || numero > lista.length) {
+        await flowDynamic("❌ Número inválido.");
+        return;
+      }
+
+      const convenio = lista[numero - 1];
+
+      await flowDynamic(formatearConvenio(convenio));
+
+      delete memory[ctx.from];
+
+      await mostrarMenu(flowDynamic);
+      // Next step: ask user if they want to search again, go to menu or contact support
+    },
+  )
+
+  // Se ejecuta después de mostrar el convenio y el menu, valida la opción y redirige
+  .addAnswer(
+    "",
+    {
+      capture: true,
+    },
+    async (ctx, { flowDynamic, gotoFlow }) => {
+      const opcion = ctx.body.trim().toLowerCase();
+
+      if (opcion === "buscar") {
+        delete memory[ctx.from];
+        return gotoFlow(submenu1Flow);
+      }
+
+      if (opcion === "menu") {
+        delete memory[ctx.from];
+        return gotoFlow(mainFlow);
+      }
+
+      if (opcion === "soporte") {
+        await flowDynamic(`📞 *Soporte Técnico*
                 📱 323493779           
                 🕗 Lunes a Viernes
                 7:00 a.m. - 12:00 p.m.
                 12:00 p.m. - 6:00 p.m.`);
-                    return;
-            }
+        return;
+      }
 
-            await flowDynamic(
-                "❌ Opción no válida.\n\nEscribe *buscar*, *menu* o *soporte*.",
-            );
-        },
-    );
+      await flowDynamic(
+        "❌ Opción no válida.\n\nEscribe *buscar*, *menu* o *soporte*.",
+      );
+    },
+  );
