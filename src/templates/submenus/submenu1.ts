@@ -124,29 +124,58 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   )
 
   // Se ejecuta solo cuando había varias coincidencias lee, valida, muestra convenio y menu
-  .addAction({ capture: true }, async (ctx, { flowDynamic }) => {
-    const lista = memory[ctx.from];
+  .addAction(
+    {
+      capture: true,
+    },
+    async (ctx, { flowDynamic, gotoFlow }) => {
+      const lista = memory[ctx.from];
 
-    if (!lista) {
-      return;
-    }
+      if (!lista) {
+        return;
+      }
 
-    const numero = parseInt(ctx.body);
+      const opcion = ctx.body.trim().toLowerCase();
 
-    if (isNaN(numero) || numero < 1 || numero > lista.length) {
-      await flowDynamic("❌ Número inválido.");
-      return;
-    }
+      if (opcion === "buscar") {
+        delete memory[ctx.from];
+        return gotoFlow(submenu1Flow);
+      }
 
-    const convenio = lista[numero - 1];
+      if (opcion === "menu") {
+        delete memory[ctx.from];
+        return gotoFlow(mainFlow);
+      }
 
-    await flowDynamic(formatearConvenio(convenio));
+      if (opcion === "soporte") {
+        delete memory[ctx.from];
 
-    delete memory[ctx.from];
+        await flowDynamic(`📞 *Soporte Técnico*
+📱 323493779
+🕗 Lunes a Viernes
+7:00 a.m. - 12:00 p.m.
+12:00 p.m. - 6:00 p.m.`);
 
-    await mostrarMenu(flowDynamic);
-    // Next step: ask user if they want to search again, go to menu or contact support
-  })
+        return;
+      }
+
+      const numero = parseInt(opcion);
+
+      if (isNaN(numero) || numero < 1 || numero > lista.length) {
+        await flowDynamic("❌ Número inválido.");
+        return;
+      }
+
+      const convenio = lista[numero - 1];
+
+      await flowDynamic(formatearConvenio(convenio));
+
+      delete memory[ctx.from];
+
+      await mostrarMenu(flowDynamic);
+      // Next step: ask user if they want to search again, go to menu or contact support
+    },
+  )
 
   // Se ejecuta después de mostrar el convenio y el menu, valida la opción y redirige
   .addAnswer(
