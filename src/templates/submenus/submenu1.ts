@@ -129,6 +129,58 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       capture: true,
     },
     async (ctx, { flowDynamic, gotoFlow }) => {
+
+      if (ctx.body.trim().toLowerCase() === "si" && sugerencias[ctx.from]) {
+        const texto = sugerencias[ctx.from];
+        delete sugerencias[ctx.from];
+
+        const resultado = await ConvenioService.buscar(texto);
+
+        const coincidencias = [
+          ...resultado.bbva,
+          ...resultado.agrario,
+          ...resultado.aval,
+        ];
+
+        if (coincidencias.length === 1) {
+          const convenio = coincidencias[0];
+
+          await flowDynamic(formatearConvenio(convenio));
+
+          const rutaImagen = resolve(
+            __dirname,
+            "images",
+            `${convenio.codigo_convenio}.png`,
+          );
+
+          if (existsSync(rutaImagen)) {
+            await flowDynamic([
+              {
+                body: "📷 *Instructivo para realizar el recaudo de este convenio.*",
+                media: rutaImagen,
+              },
+            ]);
+          }
+
+          await mostrarMenu(flowDynamic);
+          return;
+        }
+
+        memory[ctx.from] = coincidencias;
+
+        let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
+
+        coincidencias.forEach((item, index) => {
+          mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n`;
+          mensaje += `🏦 ${item.banco}\n\n`;
+        });
+
+        mensaje += "✍️ Escribe el número del convenio.";
+
+        await flowDynamic(mensaje);
+        return;
+      }
+      
       const lista = memory[ctx.from];
 
       if (!lista) {
