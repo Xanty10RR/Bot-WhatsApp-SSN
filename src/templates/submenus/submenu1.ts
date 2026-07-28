@@ -180,7 +180,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         await flowDynamic(mensaje);
         return;
       }
-      
+
       const lista = memory[ctx.from];
 
       if (!lista) {

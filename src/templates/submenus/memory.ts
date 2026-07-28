@@ -1,13 +1,7 @@
-/*export interface ResultadoMemoria {
-    banco: string;
-    id: string;
-    nombre: string;
+export interface UserMemory {
+  texto?: string;
+  sugerencia?: string;
+  resultados?: any[];
 }
 
-export interface MemoryData {
-    texto: string;
-    resultados: ResultadoMemoria[];
-    sugerencia?: string;
-}
-
-export const memory: Record<string, MemoryData> = {};*/
+export const memory: Record<string, UserMemory> = {};
