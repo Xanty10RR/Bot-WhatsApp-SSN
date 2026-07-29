@@ -1,28 +1,12 @@
-/*import { addKeyword } from "@builderbot/bot";
-import { existsSync } from "fs";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { addKeyword } from "@builderbot/bot";
 import { ConvenioService } from "../../services/convenio.service";
-import { formatearConvenio } from "../../utils/formatearConvenio";
+import { mostrarConvenio } from "../../utils/mostrarConvenio";
 import { memory } from "./memory";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-const mostrarMenu = async (flowDynamic: any) => {
-  await flowDynamic(`
-
-━━━━━━━━━━━━━━
-
-🔄 Escribe *buscar* para hacer otra consulta.
-
-🏠 Escribe *menu* para volver al inicio.
-
-📞 Escribe *soporte* para hablar con soporte.
-
-━━━━━━━━━━━━━━
-`);
-};
 
 export const seleccionarConvenioFlow = addKeyword("__SELECCIONAR__").addAnswer(
   "",
@@ -31,6 +15,8 @@ export const seleccionarConvenioFlow = addKeyword("__SELECCIONAR__").addAnswer(
   },
   async (ctx, { flowDynamic }) => {
 
+    console.log("➡️ seleccionarConvenioFlow:", ctx.body);
+
     const datos = memory[ctx.from];
 
     if (!datos) {
@@ -38,20 +24,23 @@ export const seleccionarConvenioFlow = addKeyword("__SELECCIONAR__").addAnswer(
       return;
     }
 
-    const lista = datos.resultados;
-
     const numero = Number(ctx.body);
 
-    if (
-      isNaN(numero) ||
-      numero < 1 ||
-      numero > lista.length
-    ) {
-      await flowDynamic("❌ Número inválido.");
+    if (isNaN(numero)) {
+      await flowDynamic(
+        "❌ Debes escribir únicamente el número del convenio."
+      );
       return;
     }
 
-    const seleccionado = lista[numero - 1];
+    if (numero < 1 || numero > datos.resultados.length) {
+      await flowDynamic(
+        `❌ Debes escribir un número entre 1 y ${datos.resultados.length}.`
+      );
+      return;
+    }
+
+    const seleccionado = datos.resultados[numero - 1];
 
     const convenio = await ConvenioService.obtenerPorId(
       seleccionado.banco,
@@ -59,47 +48,17 @@ export const seleccionarConvenioFlow = addKeyword("__SELECCIONAR__").addAnswer(
     );
 
     if (!convenio) {
-      await flowDynamic("❌ No pude encontrar el convenio.");
+      await flowDynamic("❌ No pude encontrar ese convenio.");
       return;
-    }
-
-    await flowDynamic(
-      formatearConvenio(convenio)
-    );
-
-    // Buscar imagen del convenio
-    const nit = convenio.nit;
-
-    if (nit) {
-
-      const extensiones = ["png", "jpg", "jpeg"];
-
-      for (const ext of extensiones) {
-
-        const imagePath = resolve(
-          __dirname,
-          "images",
-          `${nit}.${ext}`
-        );
-
-        if (existsSync(imagePath)) {
-
-          await flowDynamic([
-            {
-              body: "🖼️ Imagen del convenio",
-              media: imagePath,
-            },
-          ]);
-
-          break;
-        }
-      }
     }
 
     delete memory[ctx.from];
 
-    await mostrarMenu(flowDynamic);
+    await mostrarConvenio(
+      convenio,
+      flowDynamic,
+      __dirname
+    );
 
   }
 );
-*/
