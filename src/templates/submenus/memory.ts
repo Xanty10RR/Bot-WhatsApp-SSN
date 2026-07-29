@@ -1,7 +1,15 @@
-export interface UserMemory {
-  texto?: string;
-  sugerencia?: string;
-  resultados?: any[];
+export interface ConvenioSeleccion {
+  banco: string;
+  id: string;
+  nombre: string;
 }
 
-export const memory: Record<string, UserMemory> = {};
+export interface MemoryData {
+  texto: string;
+  sugerencia?: string;
+  resultados: ConvenioSeleccion[];
+}
+
+export const memory: Record<string, MemoryData> = {};
+
+export const sugerencias: Record<string, string> = {};
