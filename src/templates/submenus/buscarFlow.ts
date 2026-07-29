@@ -1,23 +1,24 @@
-/*
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { ConvenioService } from "../../services/convenio.service";
-import { formatearConvenio } from "../../utils/formatearConvenio";
+import { mostrarConvenio } from "../../utils/mostrarConvenio";
 import { memory } from "./memory";
-import { seleccionarConvenioFlow } from "./seleccionarConvenioFlow";
 import { sugerenciaFlow } from "./sugerenciaFlow";
+import { seleccionarConvenioFlow } from "./seleccionarConvenioFlow";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const buscarFlow = addKeyword(EVENTS.ACTION).addAnswer(
   "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
   {
     capture: true,
   },
-
   async (ctx, { flowDynamic, gotoFlow }) => {
+    const texto = ctx.body.trim();
 
-  console.log("ENTRÓ A BUSCARFLOW");
-  console.log(ctx.body);
-
-  const texto = ctx.body.trim();
+    console.log("🔎 Buscar:", texto);
 
     const resultado = await ConvenioService.buscar(texto);
 
@@ -27,62 +28,68 @@ export const buscarFlow = addKeyword(EVENTS.ACTION).addAnswer(
       ...resultado.aval,
     ];
 
-    // No encontró nada
+    // ==========================
+    // NO HAY COINCIDENCIAS
+    // ==========================
     if (coincidencias.length === 0) {
-
       const sugerencia = await ConvenioService.sugerir(texto);
 
       if (sugerencia && sugerencia.score >= 0.25) {
-
         memory[ctx.from] = {
-          texto: sugerencia.nombre_convenio,
-          resultados: [],
+          texto,
           sugerencia: sugerencia.nombre_convenio,
+          resultados: [],
         };
 
         return gotoFlow(sugerenciaFlow);
       }
 
-      await flowDynamic("❌ No encontré coincidencias.");
-      return;
-    }
-
-    // Una sola coincidencia
-    if (coincidencias.length === 1) {
-
       await flowDynamic(
-        formatearConvenio(coincidencias[0])
+        `❌ No encontré coincidencias para:
+
+"${texto}"
+
+✍️ Escribe otro nombre para realizar una nueva búsqueda.`
       );
 
       return;
     }
 
-    // Guardamos solamente lo necesario
-    const resultados = coincidencias.map((c) => ({
+    // ==========================
+    // UNA COINCIDENCIA
+    // ==========================
+    if (coincidencias.length === 1) {
+      delete memory[ctx.from];
 
-      banco: c.banco,
+      await mostrarConvenio(
+        coincidencias[0],
+        flowDynamic,
+        __dirname
+      );
 
-      id:
-        c.banco === "AVAL"
-          ? String(c.nit)
-          : String(c.codigo_convenio),
+      return;
+    }
 
-      nombre: c.nombre_convenio,
-
-    }));
-
+    // ==========================
+    // VARIAS COINCIDENCIAS
+    // ==========================
     memory[ctx.from] = {
       texto,
-      resultados,
+      resultados: coincidencias.map((item) => ({
+        banco: item.banco,
+        id:
+          item.banco === "AVAL"
+            ? String(item.nit)
+            : String(item.codigo_convenio),
+        nombre: item.nombre_convenio,
+      })),
     };
 
-    let mensaje = `🔎 Encontré *${resultados.length}* coincidencias.\n\n`;
+    let mensaje = `🔎 Encontré *${memory[ctx.from].resultados.length}* coincidencias.\n\n`;
 
-    resultados.forEach((item, index) => {
-
+    memory[ctx.from].resultados.forEach((item, index) => {
       mensaje += `${index + 1}️⃣ ${item.nombre}\n`;
       mensaje += `🏦 ${item.banco}\n\n`;
-
     });
 
     mensaje += "✍️ Escribe el número del convenio.";
@@ -90,7 +97,5 @@ export const buscarFlow = addKeyword(EVENTS.ACTION).addAnswer(
     await flowDynamic(mensaje);
 
     return gotoFlow(seleccionarConvenioFlow);
-
   }
 );
-*/
