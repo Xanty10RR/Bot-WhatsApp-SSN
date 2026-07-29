@@ -1,21 +1,24 @@
-/*import { addKeyword } from "@builderbot/bot";
+import { addKeyword } from "@builderbot/bot";
 import { ConvenioService } from "../../services/convenio.service";
 import { memory } from "./memory";
+import { mostrarConvenio } from "../../utils/mostrarConvenio";
 import { seleccionarConvenioFlow } from "./seleccionarConvenioFlow";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const sugerenciaFlow = addKeyword("__SUGERENCIA__").addAnswer(
-  `🤔 ¿Es el convenio que buscabas?
+  `🤔 ¿Quisiste decir el siguiente convenio?
 
-Responde:
+✅ Responde *SI*
 
-✅ SI
-
-❌ NO`,
+❌ Responde *NO* o escribe otro convenio.`,
   {
     capture: true,
   },
   async (ctx, { flowDynamic, gotoFlow }) => {
-
     const respuesta = ctx.body.trim().toUpperCase();
 
     const datos = memory[ctx.from];
@@ -25,10 +28,12 @@ Responde:
       return;
     }
 
+    // ==========================
+    // EL USUARIO ACEPTA LA SUGERENCIA
+    // ==========================
     if (respuesta === "SI" || respuesta === "SÍ") {
 
-      const resultado =
-        await ConvenioService.buscar(datos.sugerencia!);
+      const resultado = await ConvenioService.buscar(datos.sugerencia!);
 
       const coincidencias = [
         ...resultado.bbva,
@@ -37,46 +42,43 @@ Responde:
       ];
 
       if (coincidencias.length === 0) {
+        delete memory[ctx.from];
+
         await flowDynamic("❌ No encontré el convenio.");
+
         return;
       }
 
+      // UNA SOLA COINCIDENCIA
       if (coincidencias.length === 1) {
 
-        memory[ctx.from] = {
-          texto: datos.sugerencia!,
-          resultados: [
-            {
-              banco: coincidencias[0].banco,
-              id:
-                coincidencias[0].banco === "AVAL"
-                  ? String(coincidencias[0].nit)
-                  : String(coincidencias[0].codigo_convenio),
-              nombre: coincidencias[0].nombre_convenio,
-            },
-          ],
-        };
+        delete memory[ctx.from];
 
-        return gotoFlow(seleccionarConvenioFlow);
+        await mostrarConvenio(
+          coincidencias[0],
+          flowDynamic,
+          __dirname
+        );
+
+        return;
       }
 
-      const resultados = coincidencias.map((c) => ({
-        banco: c.banco,
-        id:
-          c.banco === "AVAL"
-            ? String(c.nit)
-            : String(c.codigo_convenio),
-        nombre: c.nombre_convenio,
-      }));
-
+      // VARIAS COINCIDENCIAS
       memory[ctx.from] = {
         texto: datos.sugerencia!,
-        resultados,
+        resultados: coincidencias.map((item) => ({
+          banco: item.banco,
+          id:
+            item.banco === "AVAL"
+              ? String(item.nit)
+              : String(item.codigo_convenio),
+          nombre: item.nombre_convenio,
+        })),
       };
 
-      let mensaje = `🔎 Encontré *${resultados.length}* coincidencias.\n\n`;
+      let mensaje = `🔎 Encontré *${memory[ctx.from].resultados.length}* coincidencias.\n\n`;
 
-      resultados.forEach((item, index) => {
+      memory[ctx.from].resultados.forEach((item, index) => {
         mensaje += `${index + 1}️⃣ ${item.nombre}\n`;
         mensaje += `🏦 ${item.banco}\n\n`;
       });
@@ -88,6 +90,9 @@ Responde:
       return gotoFlow(seleccionarConvenioFlow);
     }
 
+    // ==========================
+    // EL USUARIO RECHAZA
+    // ==========================
     if (respuesta === "NO") {
 
       delete memory[ctx.from];
@@ -99,7 +104,14 @@ Responde:
       return;
     }
 
-    await flowDynamic("❌ Responde SI o NO.");
+    // ==========================
+    // EL USUARIO ESCRIBE OTRO CONVENIO
+    // ==========================
+    if (respuesta !== "SI" && respuesta !== "SÍ") {
 
+      delete memory[ctx.from];
+
+      return gotoFlow(seleccionarConvenioFlow);
+    }
   }
-);*/
+);
