@@ -6,6 +6,8 @@ import { createFlow } from "@builderbot/bot";
 import { mainFlow } from "./mainFlow";
 
 // Importa submenús
+import { seleccionarConvenioFlow } from "./submenus/seleccionarConvenioFlow";
+import { sugerenciaFlow } from "./submenus/sugerenciaFlow";
 import { submenu1Flow } from "./submenus/submenu1";
 import { submenu2Flow } from "./submenus/submenu2";
 import { submenu3Flow } from "./submenus/submenu3";
@@ -21,6 +23,8 @@ export default createFlow([
     VerificarIdentidad,
 
     // 2. Luego los submenús
+    seleccionarConvenioFlow, // Añadido
+    sugerenciaFlow,         // Añadido
     submenu1Flow,
     submenu2Flow,
     submenu3Flow,
