@@ -1,117 +1,65 @@
-import { addKeyword } from "@builderbot/bot";
+import { addKeyword, EVENTS } from "@builderbot/bot";
 import { ConvenioService } from "../../services/convenio.service";
-import { memory } from "./memory";
-import { mostrarConvenio } from "../../utils/mostrarConvenio";
+import { submenu1Flow } from "./submenu1";
 import { seleccionarConvenioFlow } from "./seleccionarConvenioFlow";
+import { formatearConvenio } from "../../utils/formatearConvenio";
+import { existsSync } from "fs";
+import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+import { mainFlow } from "../mainFlow";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const sugerenciaFlow = addKeyword("__SUGERENCIA__").addAnswer(
-  `🤔 ¿Quisiste decir el siguiente convenio?
+const mostrarMenu = async (flowDynamic: any) => {
+  await flowDynamic(`━━━━━━━━━━━━━━\n🔄 Escribe *buscar* para hacer otra consulta.\n🏠 Escribe *menu* para volver al inicio.\n📞 Escribe *soporte* para hablar con soporte.\n━━━━━━━━━━━━━━`);
+};
 
-✅ Responde *SI*
+export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
+  .addAction(async (ctx, { state, flowDynamic }) => {
+    const myState = state.getMyState();
+    await flowDynamic(`❌ No encontré coincidencias para:\n\n"${myState.textoOriginal}"\n\n🤔 ¿Quisiste decir?\n\n📋 *${myState.sugerenciaTexto}*\n\n✅ Escribe *si* para consultar este convenio.\n\n🔄 O escribe otro nombre para realizar una nueva búsqueda.`);
+  })
+  .addAnswer(
+    "",
+    { capture: true },
+    async (ctx, { state, flowDynamic, gotoFlow }) => {
+      const opcion = ctx.body.trim().toLowerCase();
+      const myState = state.getMyState();
 
-❌ Responde *NO* o escribe otro convenio.`,
-  {
-    capture: true,
-  },
-  async (ctx, { flowDynamic, gotoFlow }) => {
-    const respuesta = ctx.body.trim().toUpperCase();
+      if (opcion === "si" && myState.sugerenciaTexto) {
+        const texto = myState.sugerenciaTexto;
+        const resultado = await ConvenioService.buscar(texto);
+        const coincidencias = [...resultado.bbva, ...resultado.agrario, ...resultado.aval];
 
-    const datos = memory[ctx.from];
+        await state.update({ sugerenciaTexto: null, textoOriginal: null });
 
-    if (!datos) {
-      await flowDynamic("⚠️ La búsqueda expiró.");
-      return;
-    }
+        if (coincidencias.length === 1) {
+          const convenio = coincidencias[0];
+          await flowDynamic(formatearConvenio(convenio));
+          const rutaImagen = resolve(__dirname, "images", `${convenio.codigo_convenio}.png`);
+          if (existsSync(rutaImagen)) {
+            await flowDynamic([{ body: "📷 *Instructivo para realizar el recaudo.*", media: rutaImagen }]);
+          }
+          await mostrarMenu(flowDynamic);
+          return;
+        }
 
-    // ==========================
-    // EL USUARIO ACEPTA LA SUGERENCIA
-    // ==========================
-    if (respuesta === "SI" || respuesta === "SÍ") {
-
-      const resultado = await ConvenioService.buscar(datos.sugerencia!);
-
-      const coincidencias = [
-        ...resultado.bbva,
-        ...resultado.agrario,
-        ...resultado.aval,
-      ];
-
-      if (coincidencias.length === 0) {
-        delete memory[ctx.from];
-
-        await flowDynamic("❌ No encontré el convenio.");
-
-        return;
+        await state.update({ listaConvenios: coincidencias });
+        return gotoFlow(seleccionarConvenioFlow);
       }
 
-      // UNA SOLA COINCIDENCIA
-      if (coincidencias.length === 1) {
-
-        delete memory[ctx.from];
-
-        await mostrarConvenio(
-          coincidencias[0],
-          flowDynamic,
-          __dirname
-        );
-
+      // Si escribe cualquier otra cosa, lo mandamos a buscar de nuevo con esa nueva palabra
+      return gotoFlow(submenu1Flow); 
+    }
+  )
+  .addAction({ capture: true }, async (ctx, { flowDynamic, gotoFlow }) => {
+      const opcion = ctx.body.trim().toLowerCase();
+      if (opcion === "buscar") return gotoFlow(submenu1Flow);
+      if (opcion === "menu") return gotoFlow(mainFlow);
+      if (opcion === "soporte") {
+        await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-V: 7:00am-12:00pm / 12:00pm-6:00pm`);
         return;
       }
-
-      // VARIAS COINCIDENCIAS
-      memory[ctx.from] = {
-        texto: datos.sugerencia!,
-        resultados: coincidencias.map((item) => ({
-          banco: item.banco,
-          id:
-            item.banco === "AVAL"
-              ? String(item.nit)
-              : String(item.codigo_convenio),
-          nombre: item.nombre_convenio,
-        })),
-      };
-
-      let mensaje = `🔎 Encontré *${memory[ctx.from].resultados.length}* coincidencias.\n\n`;
-
-      memory[ctx.from].resultados.forEach((item, index) => {
-        mensaje += `${index + 1}️⃣ ${item.nombre}\n`;
-        mensaje += `🏦 ${item.banco}\n\n`;
-      });
-
-      mensaje += "✍️ Escribe el número del convenio.";
-
-      await flowDynamic(mensaje);
-
-      return gotoFlow(seleccionarConvenioFlow);
-    }
-
-    // ==========================
-    // EL USUARIO RECHAZA
-    // ==========================
-    if (respuesta === "NO") {
-
-      delete memory[ctx.from];
-
-      await flowDynamic(
-        "✍️ Escribe nuevamente el nombre del convenio."
-      );
-
-      return;
-    }
-
-    // ==========================
-    // EL USUARIO ESCRIBE OTRO CONVENIO
-    // ==========================
-    if (respuesta !== "SI" && respuesta !== "SÍ") {
-
-      delete memory[ctx.from];
-
-      return gotoFlow(seleccionarConvenioFlow);
-    }
-  }
-);
+      await flowDynamic("❌ Opción no válida.\n\nEscribe *buscar*, *menu* o *soporte*.");
+  });
