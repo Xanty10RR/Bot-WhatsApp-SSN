@@ -15,11 +15,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const mostrarMenu = async (flowDynamic: any) => {
-  await flowDynamic(`━━━━━━━━━━━━━━
-🔄 Escribe *buscar* para hacer otra consulta.
-🏠 Escribe *menu* para volver al inicio.
-📞 Escribe *soporte* para hablar con soporte.
-━━━━━━━━━━━━━━`);
+  await flowDynamic([
+    {
+      body: `━━━━━━━━━━━━━━
+🔄 Elige una opción para continuar.
+━━━━━━━━━━━━━━`,
+      buttons: [
+        { body: "Buscar" },
+        { body: "Menú" },
+        { body: "Soporte" },
+      ],
+    },
+  ]);
 };
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
