@@ -15,7 +15,7 @@ export const pool = new Pool({
 
 export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     .addAnswer(
-        "¡Vamos a crear una nueva requisición! Por favor, dime tu *nombre completo*: ",
+        "¡Vamos a crear una nueva requisición!.\nPor favor, dime tu *nombre completo*: ",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
             await state.update({ nombre: ctx.body });
@@ -23,7 +23,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
         }
     )
     .addAnswer(
-        "Por favor coloca tu numero de cédula completo:",
+        "Por favor coloca tu *numero de cédula* completo:",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
             await state.update({ cedula: ctx.body });
@@ -253,7 +253,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
 
             } catch (error) {
                 console.error("Error al guardar:", error);
-                await flowDynamic("❌ Error al guardar. Intenta nuevamente.");
+                await flowDynamic("❌ Error al guardar la requisición. Intenta nuevamente.");
             }
 
             // Finalizar y dar opción de volver a crear una requisición o volver al menú
