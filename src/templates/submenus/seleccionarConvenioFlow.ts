@@ -22,7 +22,7 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
     coincidencias.forEach((item: { nombre_convenio: string; banco: string }, index: number) => {
       mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n🏦 ${item.banco}\n\n`;
     });
-    mensaje += "✍️ Escribe el número del convenio.";
+    mensaje += "✍️ Escribe el número del convenio que deseas seleccionar.";
     
     await flowDynamic(mensaje);
   })
