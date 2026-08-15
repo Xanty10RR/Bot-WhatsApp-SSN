@@ -14,53 +14,54 @@ import { mainFlow } from "../mainFlow";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const mostrarMenu = async (ctx: any, provider?: any) => {
+const mostrarMenu = async (ctx: any) => {
+  const token = process.env.jwtToken;
+  const numberId = process.env.numberId;
+
+  if (!token || !numberId) {
+    console.error("❌ Faltan las variables jwtToken o numberId en el .env");
+    return;
+  }
+
   const payloadBotones = {
+    messaging_product: "whatsapp",
+    recipient_type: "individual",
+    to: ctx.from,
     type: "interactive",
     interactive: {
       type: "button",
       body: {
-        text: "━━━━━━━━━━━━━━\n🔄 Elige una opción para continuar.\n━━━━━━━━━━━━━━"
+        text: "Elige una opción para continuar."
       },
       action: {
         buttons: [
-          {
-            type: "reply",
-            reply: {
-              id: "btn_buscar", // Meta exige un ID único interno
-              title: "Buscar"     // El texto que ve el usuario (Máx 20 chars)
-            }
-          },
-          {
-            type: "reply",
-            reply: {
-              id: "btn_menu",
-              title: "Menú"
-            }
-          },
-          {
-            type: "reply",
-            reply: {
-              id: "btn_soporte",
-              title: "Soporte"
-            }
-          }
+          { type: "reply", reply: { id: "btn_buscar", title: "🔄 Buscar" } },
+          { type: "reply", reply: { id: "btn_menu", title: "🏠 Menú" } },
+          { type: "reply", reply: { id: "btn_soporte", title: "📞 Soporte" } }
         ]
       }
     }
   };
 
   try {
-    // Enviamos el payload nativo usando el provider de Meta
-    // Si no se pasa el provider, intentamos obtenerlo desde ctx
-    const prov = provider || ctx._client || ctx.client || ctx.provider;
-    if (!prov || typeof prov.sendMessage !== "function") {
-      console.error("No provider disponible para enviar botones");
-      return;
+    const url = `https://graph.facebook.com/v20.0/${numberId}/messages`;
+    
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payloadBotones)
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error("❌ Error de Meta API:", JSON.stringify(data, null, 2));
     }
-    await prov.sendMessage(ctx.from, ' ', payloadBotones);
   } catch (error) {
-    console.error("Error enviando botones:", error);
+    console.error("❌ Error enviando botones:", error);
   }
 };
 
@@ -68,7 +69,8 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   .addAnswer(
     "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
     { capture: true },
-    async (ctx, { flowDynamic, gotoFlow, state, provider }) => {
+    // 🛠️ Quitamos el 'provider' que ya no se usa aquí
+    async (ctx, { flowDynamic, gotoFlow, state }) => {
       const texto = ctx.body.trim();
       const resultado = await ConvenioService.buscar(texto);
       
@@ -83,13 +85,12 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         const sugerencia = await ConvenioService.sugerir(texto);
 
         if (sugerencia && sugerencia.score >= 0.35) {
-          // Guardamos la sugerencia en el estado del usuario de forma segura
           await state.update({ sugerenciaTexto: sugerencia.nombre_convenio, textoOriginal: texto });
           return gotoFlow(sugerenciaFlow);
         }
 
         await flowDynamic("❌ No encontré coincidencias.");
-        return gotoFlow(mainFlow); // O lo devuelves a donde prefieras
+        return gotoFlow(mainFlow);
       }
 
       // CASO 2: Hay exactamente 1 -> Lo mostramos directo
@@ -106,16 +107,17 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
             },
           ]);
         }
-        await mostrarMenu(ctx, provider); // provider se detecta desde ctx si está disponible
+        
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await mostrarMenu(ctx);
         return; 
       }
 
-      // CASO 3: Hay varios -> Guardamos la lista en el estado y vamos al selector
+      // CASO 3: Hay varios
       await state.update({ listaConvenios: coincidencias });
       return gotoFlow(seleccionarConvenioFlow);
     }
   )
-  // Manejo de la navegación post-resultado (si era solo 1)
   .addAction({ capture: true }, async (ctx, { flowDynamic, gotoFlow }) => {
       const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
