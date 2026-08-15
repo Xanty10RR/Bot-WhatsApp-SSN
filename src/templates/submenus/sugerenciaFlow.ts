@@ -18,7 +18,7 @@ const mostrarMenu = async (flowDynamic: any) => {
 export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
   .addAction(async (ctx, { state, flowDynamic }) => {
     const myState = state.getMyState();
-    await flowDynamic(`❌ No encontré coincidencias para:\n\n"${myState.textoOriginal}"\n\n🤔 ¿Quisiste decir?\n\n📋 *${myState.sugerenciaTexto}*\n\n✅ Escribe *si* para consultar este convenio.\n\n🔄 O escribe otro nombre para realizar una nueva búsqueda.`);
+    await flowDynamic(`❌ No encontré coincidencias para:\n\n"${myState.textoOriginal}"\n\n🤔 ¿Quisiste decir?\n\n📋 *${myState.sugerenciaTexto}*\n\n✅ Escribe *SI* para consultar este convenio.\n\n🔄 O escribe *OTRO NOMBRE* para realizar una nueva búsqueda.`);
   })
   .addAnswer(
     "",
