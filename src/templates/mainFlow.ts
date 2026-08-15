@@ -12,7 +12,7 @@ const mainFlow = addKeyword(['inicio', 'menu', EVENTS.WELCOME])
                 text: "Soy el Asistente de SuperGiros"
             },
             body: { 
-                text: "¡Hola! 👋 Estoy aquí las 24h para brindarte una mejor experiencia y ayudarte a consultar *códigos de convenios* y hacer *requisiciones* de forma rápida.\n ¿Qué deseas hacer hoy?, selecciona una opción" 
+                text: "¡Hola! 👋 Estoy aquí las 24h para brindarte una mejor experiencia y ayudarte a consultar *códigos de convenios* y hacer *requisiciones* de forma rápida.\n¿Qué deseas hacer hoy?, selecciona una opción" 
             },
             footer: { 
                 text: "SUPERSERVICIOS DE NARIÑO S.A" 
