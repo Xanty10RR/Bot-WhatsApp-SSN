@@ -68,7 +68,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   .addAnswer(
     "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
     { capture: true },
-    async (ctx, { flowDynamic, gotoFlow, state }) => {
+    async (ctx, { flowDynamic, gotoFlow, state, provider }) => {
       const texto = ctx.body.trim();
       const resultado = await ConvenioService.buscar(texto);
       
@@ -106,7 +106,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
             },
           ]);
         }
-        await mostrarMenu(ctx); // provider se detecta desde ctx si está disponible
+        await mostrarMenu(ctx, provider); // provider se detecta desde ctx si está disponible
         return; 
       }
 
