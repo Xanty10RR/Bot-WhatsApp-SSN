@@ -117,7 +117,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   )
   // Manejo de la navegación post-resultado (si era solo 1)
   .addAction({ capture: true }, async (ctx, { flowDynamic, gotoFlow }) => {
-      const opcion = ctx.body.trim().toLowerCase();
+      const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
       if (opcion === "buscar") return gotoFlow(submenu1Flow);
       if (opcion === "menu") return gotoFlow(mainFlow);
