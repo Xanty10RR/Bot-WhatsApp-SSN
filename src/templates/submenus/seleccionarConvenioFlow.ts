@@ -56,7 +56,7 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
     if (opcion === "buscar") return gotoFlow(submenu1Flow);
     if (opcion === "menu") return gotoFlow(mainFlow);
     if (opcion === "soporte") {
-      await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-V: 7:00am-12:00pm / 12:00pm-6:00pm`);
+      await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-S: 7:30am-02:00pm / 02:00pm-10:00pm`);
       return;
     }
     await flowDynamic("❌ Opción no válida.\n\nEscribe *buscar*, *menu* o *soporte*.");
