@@ -9,7 +9,7 @@ const mainFlow = addKeyword(['inicio', 'menu', EVENTS.WELCOME])
         const list = {
             header: { 
                 type: "text", 
-                text: "Asistente de SuperGiros"
+                text: "Soy el Asistente de SuperGiros"
             },
             body: { 
                 text: "¡Hola! 👋 Estoy aquí las 24h para brindarte una mejor experiencia y ayudarte a consultar *códigos de convenios* y hacer *requisiciones* de forma rápida." 
