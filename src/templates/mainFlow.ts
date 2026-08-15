@@ -1,42 +1,49 @@
-import { addKeyword, EVENTS} from "@builderbot/bot";
-import { provider } from "~/provider";
-import { text } from "stream/consumers";
+import { addKeyword, EVENTS } from "@builderbot/bot";
 import { MENU_IDS } from "./constants";
 
-
-const mainFlow = addKeyword(['inicio','menu',EVENTS.WELCOME])
-    .addAnswer (
-        '',
-        {
-            capture: false
-        },
-    async (ctx, { provider }) => {
+const mainFlow = addKeyword(['inicio', 'menu', EVENTS.WELCOME])
+    .addAnswer('') 
+    .addAction(async (ctx, { provider }) => {
+        
+        // Estructura limpia y validada para los servidores de Meta
         const list = {
-            header: { type: "text", text: "*¡Hola! 👋, Bienvenido al Asistente de SuperGiros* 🔵⚪\n\n" },
-            body: { text: "Estoy aquí las 24h para brindarte una mejor experiencia y ayudarte a consultar *códigos de convenios*, *instrucciones de pago sobre facturas de convenios* y *hacer requisiciones* de forma rápida." },
-            footer: { text: "¿Que deseas hacer hoy?, por favor selecciona una opción:" },
+            header: { 
+                type: "text", 
+                text: "Asistente de SuperGiros"
+            },
+            body: { 
+                text: "¡Hola! 👋 Estoy aquí las 24h para brindarte una mejor experiencia y ayudarte a consultar *códigos de convenios* y hacer *requisiciones* de forma rápida." 
+            },
+            footer: { 
+                text: "¿Qué deseas hacer hoy?, selecciona una opción" 
+            },
             action: {
-                button: "Lista de opciones",
+                button: "Ver opciones", // ⚠️ Máximo 20 caracteres 
                 sections: [
                     {
-                        title: "Ayuda",
+                        title: "Ayuda y Servicios",
                         rows: [
                             {
                                 id: MENU_IDS.PRINCIPAL.OPCION1,
-                                title: "🔍 Consultar un convenio",
-                                description: "Solicita información de convenio, instrucciones de pago"
+                                title: "🔍 Consultar convenio", // ⚠️ Máximo 24 caracteres
+                                description: "Solicita información de convenio, instrucciones de pago" // ⚠️ Máximo 72 caracteres
                             },
                             {
                                 id: MENU_IDS.PRINCIPAL.OPCION3,
-                                title: "📋 Proceso de requisición",
+                                title: "📋 Hacer requisición",
                                 description: "Solicita activos, insumos, repuestos, servicios..."
                             }
                         ]
                     }
                 ]
             }
+        };
+
+        try {
+            await provider.sendList(ctx.from, list);
+        } catch (error) {
+            console.error("Error al enviar la lista:", error);
         }
-        await provider.sendList(ctx.from, list)
-    }    
-    )    
-export {mainFlow};
+    });
+
+export { mainFlow };
