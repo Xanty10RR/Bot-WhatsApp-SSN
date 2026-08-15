@@ -14,19 +14,54 @@ import { mainFlow } from "../mainFlow";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const mostrarMenu = async (flowDynamic: any) => {
-  await flowDynamic([
-    {
-      body: `━━━━━━━━━━━━━━
-🔄 Elige una opción para continuar.
-━━━━━━━━━━━━━━`,
-      buttons: [
-        { body: "Buscar" },
-        { body: "Menú" },
-        { body: "Soporte" },
-      ],
-    },
-  ]);
+const mostrarMenu = async (ctx: any, provider?: any) => {
+  const payloadBotones = {
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: {
+        text: "━━━━━━━━━━━━━━\n🔄 Elige una opción para continuar.\n━━━━━━━━━━━━━━"
+      },
+      action: {
+        buttons: [
+          {
+            type: "reply",
+            reply: {
+              id: "btn_buscar", // Meta exige un ID único interno
+              title: "Buscar"     // El texto que ve el usuario (Máx 20 chars)
+            }
+          },
+          {
+            type: "reply",
+            reply: {
+              id: "btn_menu",
+              title: "Menú"
+            }
+          },
+          {
+            type: "reply",
+            reply: {
+              id: "btn_soporte",
+              title: "Soporte"
+            }
+          }
+        ]
+      }
+    }
+  };
+
+  try {
+    // Enviamos el payload nativo usando el provider de Meta
+    // Si no se pasa el provider, intentamos obtenerlo desde ctx
+    const prov = provider || ctx._client || ctx.client || ctx.provider;
+    if (!prov || typeof prov.sendMessage !== "function") {
+      console.error("No provider disponible para enviar botones");
+      return;
+    }
+    await prov.sendMessage(ctx.from, ' ', payloadBotones);
+  } catch (error) {
+    console.error("Error enviando botones:", error);
+  }
 };
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
@@ -71,7 +106,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
             },
           ]);
         }
-        await mostrarMenu(flowDynamic);
+        await mostrarMenu(ctx); // provider se detecta desde ctx si está disponible
         return; 
       }
 
