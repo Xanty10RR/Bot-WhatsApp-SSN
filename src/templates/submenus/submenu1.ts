@@ -14,55 +14,14 @@ import { mainFlow } from "../mainFlow";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const mostrarMenu = async (ctx: any) => {
-  const token = process.env.jwtToken;
-  const numberId = process.env.numberId;
-
-  if (!token || !numberId) {
-    console.error("❌ Faltan las variables jwtToken o numberId en el .env");
-    return;
-  }
-
-  const payloadBotones = {
-    messaging_product: "whatsapp",
-    recipient_type: "individual",
-    to: ctx.from,
-    type: "interactive",
-    interactive: {
-      type: "button",
-      body: {
-        text: "Elige una opción para continuar."
-      },
-      action: {
-        buttons: [
-          { type: "reply", reply: { id: "btn_buscar", title: "🔄 Buscar" } },
-          { type: "reply", reply: { id: "btn_menu", title: "🏠 Menú" } },
-          { type: "reply", reply: { id: "btn_soporte", title: "📞 Soporte" } }
-        ]
-      }
-    }
-  };
-
-  try {
-    const url = `https://graph.facebook.com/v20.0/${numberId}/messages`;
-    
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payloadBotones)
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      console.error("❌ Error de Meta API:", JSON.stringify(data, null, 2));
-    }
-  } catch (error) {
-    console.error("❌ Error enviando botones:", error);
-  }
+const mostrarMenu = async (ctx: any, { flowDynamic }: { flowDynamic: any }) => {
+  await flowDynamic(
+    "Elige una opción para continuar:\n\n" +
+    "1️⃣ 🔄 Buscar\n" +
+    "2️⃣ 🏠 Menú\n" +
+    "3️⃣ 📞 Soporte\n\n" +
+    "✍️ *Escribe el número de tu opción (1, 2 o 3)*"
+  );
 };
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
@@ -109,7 +68,6 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         }
         
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        await mostrarMenu(ctx);
         return; 
       }
 
@@ -118,9 +76,9 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       return gotoFlow(seleccionarConvenioFlow);
     }
   )
-  .addAction({ capture: true }, async (ctx, { flowDynamic, gotoFlow }) => {
+  .addAction(async (ctx, { flowDynamic, gotoFlow }) => {
       const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
+      
       if (opcion === "buscar") return gotoFlow(submenu1Flow);
       if (opcion === "menu") return gotoFlow(mainFlow);
       if (opcion === "soporte") {
