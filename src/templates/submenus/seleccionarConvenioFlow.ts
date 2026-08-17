@@ -68,7 +68,7 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
 
     let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias.\n\n`;
     coincidencias.forEach((item: { nombre_convenio: string; banco: string }, index: number) => {
-      mensaje += `${index + 1}️⃣ ${item.nombre_convenio}\n🏦 ${item.banco}\n\n`;
+      mensaje += `*${index + 1}.* ${item.nombre_convenio}\n🏦 ${item.banco}\n\n`;
     });
     mensaje += "✍️ Escribe el número del convenio que deseas seleccionar.";
     
