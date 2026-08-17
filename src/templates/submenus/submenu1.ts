@@ -79,7 +79,6 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       return gotoFlow(seleccionarConvenioFlow);
     }
   )
-  // ÚNICO addAction con captura para el menú posterior
   .addAnswer(
     "", 
     { capture: true },
