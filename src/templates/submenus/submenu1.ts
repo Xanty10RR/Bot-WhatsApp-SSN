@@ -68,11 +68,10 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         // Esperamos 2 segundos y mostramos el menú de opciones
         await new Promise((resolve) => setTimeout(resolve, 2000));
         await flowDynamic(
-          "Elige una opción para continuar:\n\n" +
+          "✍️ *Escribe el número de tu opción (1, 2 o 3)* para continuar:\n\n" +
           "1️⃣ 🔄 Buscar\n" +
           "2️⃣ 🏠 Menú\n" +
-          "3️⃣ 📞 Soporte\n\n" +
-          "✍️ *Escribe el número de tu opción (1, 2 o 3)*"
+          "3️⃣ 📞 Soporte\n\n"
         );
         return; 
       }
@@ -92,7 +91,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       if (opcion === "1" || opcion === "buscar") return gotoFlow(submenu1Flow);
       if (opcion === "2" || opcion === "menu") return gotoFlow(mainFlow);
       if (opcion === "3" || opcion === "soporte") {
-        await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-S: 7:30am-02:00pm / 02:00pm-10:00pm`);
+        await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-S: 7:30am - 02:00pm / 02:00pm - 10:00pm`);
         return;
       }
       
