@@ -67,7 +67,7 @@ const mostrarMenu = async (ctx: any) => {
 
 export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   .addAnswer(
-    "✍️ Escribe el nombre del convenio, NIT, empresa o sigla.",
+    "✍️ Escribe el NIT, nombre, empresa o sigla del convenio que deseas consultar.",
     { capture: true },
     // 🛠️ Quitamos el 'provider' que ya no se usa aquí
     async (ctx, { flowDynamic, gotoFlow, state }) => {
