@@ -78,7 +78,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       return gotoFlow(seleccionarConvenioFlow);
     },
   )
-  .addAnswer("", { capture: true }, async (ctx, { flowDynamic, gotoFlow }) => {
+  .addAnswer("", { capture: true }, async (ctx, { flowDynamic, gotoFlow, fallBack }) => {
     const opcion = ctx.body
       .trim()
       .toLowerCase()
@@ -94,7 +94,9 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       return gotoFlow(mainFlow);
     }
 
-    await flowDynamic(
-      "❌ Opción no válida.\n\nEscribe *1* (Buscar), *2* (Menú) o *3* (Soporte).",
-    );
-  });
+    // Si no es 1, 2 o 3, uso fallBack para mostrar error y repetir el menú
+      return fallBack(
+        "❌ Opción no válida.\n\nPor favor, escribe solo el número:\n1️⃣ 🔄 Buscar\n2️⃣ 🏠 Menú\n3️⃣ 📞 Soporte"
+      );
+  }
+);
