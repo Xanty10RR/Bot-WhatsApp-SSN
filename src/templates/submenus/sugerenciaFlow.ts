@@ -11,10 +11,19 @@ import { mainFlow } from "../mainFlow";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Función reutilizable con fetch directo a Meta API para enviar botones interactivos
-const mostrarMenu = async (ctx: any, texto?: string, customButtons?: { id: string; title: string }[]) => {
+const mostrarMenu = async (ctx: any, texto: string, botones: any[]) => {
+  // Aquí mantienes tu lógica original para enviar los botones interactivos
   const token = process.env.jwtToken;
   const numberId = process.env.numberId;
+
+const menuContinuar = async (ctx: any, { flowDynamic }: { flowDynamic: any }) => {
+  await flowDynamic(
+    "✍️ *Escribe el número de tu opción (1, 2 o 3)* para continuar:\n\n" +
+    "1️⃣ 🔄 Buscar\n" +
+    "2️⃣ 🏠 Menú\n" +
+    "3️⃣ 📞 Soporte\n\n"
+  );
+};
 
   if (!token || !numberId) {
     console.error("❌ Faltan las variables jwtToken o numberId en el .env");
@@ -28,23 +37,19 @@ const mostrarMenu = async (ctx: any, texto?: string, customButtons?: { id: strin
     type: "interactive",
     interactive: {
       type: "button",
-      body: {
-        text: texto || "Elige una opción para continuar."
-      },
+      body: { text: texto },
       action: {
-        buttons: (customButtons || [
-          { id: "btn_buscar", title: "🔄 Buscar" },
-          { id: "btn_menu", title: "🏠 Menú" },
-          { id: "btn_soporte", title: "📞 Soporte" }
-        ]).slice(0,3).map(b => ({ type: "reply", reply: { id: b.id, title: b.title } }))
+        buttons: botones.map(b => ({
+          type: "reply",
+          reply: { id: b.id, title: b.title }
+        }))
       }
     }
   };
 
   try {
     const url = `https://graph.facebook.com/v20.0/${numberId}/messages`;
-    
-    const response = await fetch(url, {
+    await fetch(url, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -52,12 +57,6 @@ const mostrarMenu = async (ctx: any, texto?: string, customButtons?: { id: strin
       },
       body: JSON.stringify(payloadBotones)
     });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      console.error("❌ Error de Meta API:", JSON.stringify(data, null, 2));
-    }
   } catch (error) {
     console.error("❌ Error enviando botones:", error);
   }
@@ -67,6 +66,7 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
   .addAction(async (ctx, { state }) => {
     const myState = state.getMyState();
     const texto = `❌ No encontré coincidencias para:\n\n"${myState.textoOriginal}"\n\n🤔 ¿Quisiste decir?\n\n📋 *${myState.sugerenciaTexto}*\n\n✅ Presiona *SI* para consultar este convenio.\n\n🔄 O presiona *OTRO NOMBRE* para realizar una nueva búsqueda.`;
+    
     await mostrarMenu(ctx, texto, [
       { id: "btn_si", title: "SI" },
       { id: "btn_otro", title: "OTRO NOMBRE" }
@@ -76,10 +76,10 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
     "",
     { capture: true },
     async (ctx, { state, flowDynamic, gotoFlow }) => {
-      const opcion = ctx.body.trim().toLowerCase();
+      const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const myState = state.getMyState();
 
-      if (opcion === "si" && myState.sugerenciaTexto) {
+      if ((opcion === "si" || opcion === "btn_si" || opcion === "1") && myState.sugerenciaTexto) {
         const texto = myState.sugerenciaTexto;
         const resultado = await ConvenioService.buscar(texto);
         const coincidencias = [...resultado.bbva, ...resultado.agrario, ...resultado.aval];
@@ -94,10 +94,7 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
             await flowDynamic([{ body: "📷 *Instructivo para realizar el recaudo.*", media: rutaImagen }]);
           }
           
-          // 🚦 Pausa de 2 segundos para asegurar que la imagen llegue antes que los botones
           await new Promise((resolve) => setTimeout(resolve, 2000));
-          
-          await mostrarMenu(ctx);
           return;
         }
 
@@ -105,19 +102,24 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
         return gotoFlow(seleccionarConvenioFlow);
       }
 
-      // Si escribe cualquier otra cosa, lo mandamos a buscar de nuevo con esa nueva palabra
-      return gotoFlow(submenu1Flow); 
+      if (opcion === "otro nombre" || opcion === "btn_otro" || opcion === "2") {
+        return gotoFlow(submenu1Flow);
+      }
     }
   )
-  .addAction({ capture: true }, async (ctx, { flowDynamic, gotoFlow }) => {
-      // Limpieza de tildes para que detecte correctamente "Menú" o "menu"
+  .addAnswer(
+    "", 
+    { capture: true },
+    async (ctx, { flowDynamic, gotoFlow }) => {
       const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      if (opcion === "buscar") return gotoFlow(submenu1Flow);
-      if (opcion === "menu") return gotoFlow(mainFlow);
-      if (opcion === "soporte") {
-        await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-S: 7:30am-02:00pm / 02:00pm-10:00pm`);
-        return;
+      if (opcion === "1" || opcion === "buscar") return gotoFlow(submenu1Flow);
+      if (opcion === "2" || opcion === "menu") return gotoFlow(mainFlow);
+      if (opcion === "3" || opcion === "soporte") {
+        await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-S: 7:30am - 02:00pm / 02:00pm - 10:00pm`);
+        return gotoFlow(mainFlow);
       }
-      await flowDynamic("❌ Opción no válida.\n\nEscribe *buscar*, *menu* o *soporte*.");
-  });
+      
+      await flowDynamic("❌ Opción no válida.\n\nEscribe *1* (Buscar), *2* (Menú) o *3* (Soporte).");
+    }
+  );
