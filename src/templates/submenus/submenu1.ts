@@ -92,7 +92,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       if (opcion === "2" || opcion === "menu") return gotoFlow(mainFlow);
       if (opcion === "3" || opcion === "soporte") {
         await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-S: 7:30am - 02:00pm / 02:00pm - 10:00pm`);
-        return;
+        return gotoFlow(mainFlow);
       }
       
       await flowDynamic("❌ Opción no válida.\n\nEscribe *1* (Buscar), *2* (Menú) o *3* (Soporte).");
