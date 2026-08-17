@@ -11,19 +11,10 @@ import { mainFlow } from "../mainFlow";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const mostrarMenu = async (ctx: any, texto: string, botones: any[]) => {
-  // Aquí mantienes tu lógica original para enviar los botones interactivos
+// Función para enviar los botones interactivos iniciales (SI / OTRO NOMBRE)
+const mostrarMenuBotones = async (ctx: any, texto: string, botones: any[]) => {
   const token = process.env.jwtToken;
   const numberId = process.env.numberId;
-
-const menuContinuar = async (ctx: any, { flowDynamic }: { flowDynamic: any }) => {
-  await flowDynamic(
-    "✍️ *Escribe el número de tu opción (1, 2 o 3)* para continuar:\n\n" +
-    "1️⃣ 🔄 Buscar\n" +
-    "2️⃣ 🏠 Menú\n" +
-    "3️⃣ 📞 Soporte\n\n"
-  );
-};
 
   if (!token || !numberId) {
     console.error("❌ Faltan las variables jwtToken o numberId en el .env");
@@ -67,7 +58,7 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
     const myState = state.getMyState();
     const texto = `❌ No encontré coincidencias para:\n\n"${myState.textoOriginal}"\n\n🤔 ¿Quisiste decir?\n\n📋 *${myState.sugerenciaTexto}*\n\n✅ Presiona *SI* para consultar este convenio.\n\n🔄 O presiona *OTRO NOMBRE* para realizar una nueva búsqueda.`;
     
-    await mostrarMenu(ctx, texto, [
+    await mostrarMenuBotones(ctx, texto, [
       { id: "btn_si", title: "SI" },
       { id: "btn_otro", title: "OTRO NOMBRE" }
     ]);
@@ -79,6 +70,7 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
       const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const myState = state.getMyState();
 
+      // Si acepta la sugerencia (SI, btn_si, o "1")
       if ((opcion === "si" || opcion === "btn_si" || opcion === "1") && myState.sugerenciaTexto) {
         const texto = myState.sugerenciaTexto;
         const resultado = await ConvenioService.buscar(texto);
@@ -95,16 +87,28 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
           }
           
           await new Promise((resolve) => setTimeout(resolve, 2000));
-          return;
+          
+          // Mostramos el menú de texto plano directamente aquí
+          await flowDynamic(
+            "Elige una opción para continuar:\n\n" +
+            "1️⃣ 🔄 Buscar\n" +
+            "2️⃣ 🏠 Menú\n" +
+            "3️⃣ 📞 Soporte\n\n" +
+            "✍️ *Escribe el número de tu opción (1, 2 o 3)*"
+          );
+          return; 
         }
 
         await state.update({ listaConvenios: coincidencias });
         return gotoFlow(seleccionarConvenioFlow);
       }
 
-      if (opcion === "otro nombre" || opcion === "btn_otro" || opcion === "2") {
+      // Si elige otro nombre
+      if (opcion.includes("otro") || opcion === "btn_otro" || opcion === "2") {
         return gotoFlow(submenu1Flow);
       }
+
+      return gotoFlow(submenu1Flow);
     }
   )
   .addAnswer(
