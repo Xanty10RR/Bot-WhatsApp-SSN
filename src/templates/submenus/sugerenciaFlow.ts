@@ -114,7 +114,7 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
   .addAnswer(
     "", 
     { capture: true },
-    async (ctx, { flowDynamic, gotoFlow }) => {
+    async (ctx, { flowDynamic, gotoFlow, fallBack }) => {
       const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
       if (opcion === "1" || opcion === "buscar") return gotoFlow(submenu1Flow);
@@ -124,6 +124,9 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
         return gotoFlow(mainFlow);
       }
       
-      await flowDynamic("❌ Opción no válida.\n\nEscribe *1* (Buscar), *2* (Menú) o *3* (Soporte).");
+      // Si no es 1, 2 o 3, uso fallBack para mostrar error y repetir el menú
+      return fallBack(
+        "❌ Opción no válida.\n\nPor favor, escribe solo el número:\n1️⃣ 🔄 Buscar\n2️⃣ 🏠 Menú\n3️⃣ 📞 Soporte"
+      );
     }
   );
