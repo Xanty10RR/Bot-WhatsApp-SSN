@@ -9,58 +9,6 @@ import { mainFlow } from "../mainFlow";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Función reutilizable con fetch directo a Meta API para enviar botones interactivos
-const mostrarMenu = async (ctx: any) => {
-  const token = process.env.jwtToken;
-  const numberId = process.env.numberId;
-
-  if (!token || !numberId) {
-    console.error("❌ Faltan las variables jwtToken o numberId en el .env");
-    return;
-  }
-
-  const payloadBotones = {
-    messaging_product: "whatsapp",
-    recipient_type: "individual",
-    to: ctx.from,
-    type: "interactive",
-    interactive: {
-      type: "button",
-      body: {
-        text: "Elige una opción para continuar."
-      },
-      action: {
-        buttons: [
-          { type: "reply", reply: { id: "btn_buscar", title: "🔄 Buscar" } },
-          { type: "reply", reply: { id: "btn_menu", title: "🏠 Menú" } },
-          { type: "reply", reply: { id: "btn_soporte", title: "📞 Soporte" } }
-        ]
-      }
-    }
-  };
-
-  try {
-    const url = `https://graph.facebook.com/v20.0/${numberId}/messages`;
-    
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payloadBotones)
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      console.error("❌ Error de Meta API:", JSON.stringify(data, null, 2));
-    }
-  } catch (error) {
-    console.error("❌ Error enviando botones:", error);
-  }
-};
-
 export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
   .addAction(async (ctx, { state, flowDynamic }) => {
     const myState = state.getMyState();
@@ -77,12 +25,13 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
   .addAnswer(
     "", // El texto ya se mandó en el addAction
     { capture: true },
-    async (ctx, { state, flowDynamic, fallBack }) => {
+    async (ctx, { state, flowDynamic, fallBack, gotoFlow }) => {
       const myState = state.getMyState();
       const coincidencias = myState.listaConvenios || [];
-      const numero = parseInt(ctx.body.trim());
+      const textoIngresado = ctx.body.trim();
+      const numero = parseInt(textoIngresado);
 
-      // Validación a prueba de fallos
+      // Validación a prueba de fallos para seleccionar el convenio de la lista
       if (isNaN(numero) || numero < 1 || numero > coincidencias.length) {
         return fallBack("❌ Número inválido. Por favor, escribe un número de la lista.");
       }
@@ -97,21 +46,32 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
 
       await state.update({ listaConvenios: null }); // Limpiamos la memoria
       
-      // 🚦 Pausa de 2 segundos para asegurar que la imagen llegue antes que los botones
+      // 🚦 Pausa de 2 segundos para asegurar que la imagen llegue antes que el menú
       await new Promise((resolve) => setTimeout(resolve, 2000));
       
-      await mostrarMenu(ctx);
+      // Enviamos el menú de texto plano solicitado
+      await flowDynamic(
+        "Elige una opción para continuar:\n\n" +
+        "1️⃣ 🔄 Buscar\n" +
+        "2️⃣ 🏠 Menú\n" +
+        "3️⃣ 📞 Soporte\n\n" +
+        "✍️ *Escribe el número de tu opción (1, 2 o 3)*"
+      );
     }
   )
-  .addAction({ capture: true }, async (ctx, { flowDynamic, gotoFlow }) => {
-      // Limpieza de tildes para que detecte correctamente "Menú" o "menu"
+  .addAnswer(
+    "", 
+    { capture: true }, 
+    async (ctx, { flowDynamic, gotoFlow }) => {
       const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      if (opcion === "buscar") return gotoFlow(submenu1Flow);
-      if (opcion === "menu") return gotoFlow(mainFlow);
-      if (opcion === "soporte") {
+      if (opcion === "1" || opcion === "buscar") return gotoFlow(submenu1Flow);
+      if (opcion === "2" || opcion === "menu") return gotoFlow(mainFlow);
+      if (opcion === "3" || opcion === "soporte") {
         await flowDynamic(`📞 *Soporte Técnico*\n📱 323493779\n🕗 L-S: 7:30am-02:00pm / 02:00pm-10:00pm`);
-        return;
+        return gotoFlow(mainFlow);
       }
-      await flowDynamic("❌ Opción no válida.\n\nEscribe *buscar*, *menu* o *soporte*.");
-  });
+      
+      await flowDynamic("❌ Opción no válida.\n\nEscribe *1* (Buscar), *2* (Menú) o *3* (Soporte).");
+    }
+  );
