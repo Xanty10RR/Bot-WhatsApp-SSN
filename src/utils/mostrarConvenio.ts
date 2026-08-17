@@ -1,4 +1,4 @@
-import { existsSync } from "fs";
+/*import { existsSync } from "fs";
 import { resolve } from "path";
 import { formatearConvenio } from "./formatearConvenio";
 
@@ -36,4 +36,4 @@ export const mostrarConvenio = async (
 
 ━━━━━━━━━━━━━━
 `);
-};
+};*/

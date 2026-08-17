@@ -1,4 +1,4 @@
-import { ConvenioService } from "../services/convenio.service";
+/*import { ConvenioService } from "../services/convenio.service";
 import { formatearBusqueda } from "../utils/formatearBusqueda";
 
 async function main() {
@@ -13,4 +13,4 @@ async function main() {
 
 }
 
-main().catch(console.error);
+main().catch(console.error);*/
