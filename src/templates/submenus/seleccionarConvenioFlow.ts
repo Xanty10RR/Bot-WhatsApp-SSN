@@ -72,7 +72,7 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
         return gotoFlow(mainFlow);
       }
       
-      // Si no es 1, 2 o 3, usamos fallBack para mostrar el mensaje de error y repetir el menú automáticamente
+      // Si no es 1, 2 o 3, uso fallBack para mostrar error y repetir el menú
       return fallBack(
         "❌ Opción no válida.\n\nPor favor, escribe solo el número:\n1️⃣ 🔄 Buscar\n2️⃣ 🏠 Menú\n3️⃣ 📞 Soporte"
       );
