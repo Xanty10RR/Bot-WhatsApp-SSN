@@ -65,20 +65,30 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
           ]);
         }
         
+        // Esperamos 2 segundos y mostramos el menú de opciones
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        await mostrarMenu(ctx, { flowDynamic }); // Pasamos flowDynamic aquí
+        await flowDynamic(
+          "Elige una opción para continuar:\n\n" +
+          "1️⃣ 🔄 Buscar\n" +
+          "2️⃣ 🏠 Menú\n" +
+          "3️⃣ 📞 Soporte\n\n" +
+          "✍️ *Escribe el número de tu opción (1, 2 o 3)*"
+        );
         return; 
       }
 
-      // CASO 3: Hay varios
+      // CASO 3: Hay varias coincidencias
       await state.update({ listaConvenios: coincidencias });
       return gotoFlow(seleccionarConvenioFlow);
     }
   )
-  .addAction(async (ctx, { flowDynamic, gotoFlow }) => {
+  // ÚNICO addAction con captura para el menú posterior
+  .addAnswer(
+    "", 
+    { capture: true },
+    async (ctx, { flowDynamic, gotoFlow }) => {
       const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      // Soportamos tanto números como texto para mayor comodidad del usuario
       if (opcion === "1" || opcion === "buscar") return gotoFlow(submenu1Flow);
       if (opcion === "2" || opcion === "menu") return gotoFlow(mainFlow);
       if (opcion === "3" || opcion === "soporte") {
@@ -87,4 +97,5 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       }
       
       await flowDynamic("❌ Opción no válida.\n\nEscribe *1* (Buscar), *2* (Menú) o *3* (Soporte).");
-  });
+    }
+  );
