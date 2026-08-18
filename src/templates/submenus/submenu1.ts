@@ -30,7 +30,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
       if (coincidencias.length === 0) {
         const sugerencia = await ConvenioService.sugerir(texto);
 
-        if (sugerencia && sugerencia.score >= 0.35) {
+        if (sugerencia && sugerencia.score >= 0.20) {
           await state.update({
             sugerenciaTexto: sugerencia.nombre_convenio,
             textoOriginal: texto,
