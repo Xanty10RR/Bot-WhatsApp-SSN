@@ -90,11 +90,10 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
           
           // Mostramos el menú de texto plano directamente aquí
           await flowDynamic(
-            "Elige una opción para continuar:\n\n" +
+            "✍️ *Escribe el número de tu opción (1, 2 o 3)* para continuar:\n\n" +
             "1️⃣ 🔄 Buscar\n" +
             "2️⃣ 🏠 Menú\n" +
-            "3️⃣ 📞 Soporte\n\n" +
-            "✍️ *Escribe el número de tu opción (1, 2 o 3)*"
+            "3️⃣ 📞 Soporte\n\n"
           );
           return; 
         }
