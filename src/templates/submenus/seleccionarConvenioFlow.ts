@@ -91,7 +91,7 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
 
       await state.update({ listaConvenios: null, listaConveniosOriginal: null, paginaConvenios: null });
       
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       
       await flowDynamic(
         "✍️ *Escribe el número de tu opción (1, 2 o 3)* para continuar:\n\n" +
