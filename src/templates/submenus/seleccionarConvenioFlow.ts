@@ -22,7 +22,7 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
     const fin = inicio + porPagina;
     const sliceConvenios = listaCompleta.slice(inicio, fin);
 
-    let mensaje = `🔎 Encontré *${listaCompleta.length} total* coincidencias (Página ${pagina + 1} de ${Math.ceil(listaCompleta.length / porPagina)}):\n\n`;
+    let mensaje = `🔎 Encontré *${listaCompleta.length} coincidencias en total* (_Página_ _${pagina + 1}_ _de_ _${Math.ceil(listaCompleta.length / porPagina)}_):\n\n`;
     
     sliceConvenios.forEach((item: any, index: number) => {
       // El número real en la lista global (ej: 1, 2... o 11, 12...)
