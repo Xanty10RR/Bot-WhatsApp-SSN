@@ -17,13 +17,13 @@ ${convenio.nit}
 📄 *Referencia:*
 ${convenio.referencia}
 
-🔠 *Tipo referencia:*
+🔀 *Tipo referencia:*
 ${convenio.tipo_referencia}
 
 📏 *Longitud:*
 ${convenio.longitud_referencia}
 
-📦 *Código de barras:*
+🫆 *Código de barras:*
 ${convenio.codigo_barras}
 
 ✍️ *Manual:*
