@@ -86,7 +86,7 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
             await flowDynamic([{ body: "📷 *Instructivo para realizar el recaudo.*", media: rutaImagen }]);
           }
           
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 1500));
           
           // Mostramos el menú de texto plano directamente aquí
           await flowDynamic(

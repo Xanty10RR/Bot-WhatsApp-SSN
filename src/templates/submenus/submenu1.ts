@@ -62,7 +62,7 @@ export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         }
 
         // Esperamos 2 segundos y mostramos el menú de opciones de texto plano
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         await flowDynamic(
           "✍️ *Escribe el número de tu opción (1, 2 o 3)* para continuar:\n\n" +
             "1️⃣ 🔄 Buscar\n" +
