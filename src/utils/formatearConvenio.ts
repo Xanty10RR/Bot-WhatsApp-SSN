@@ -44,7 +44,7 @@ ${convenio.nit}
 📂 *Categoría:*
 ${convenio.categoria}
 
-🛰️ *Tipo captura:*
+📦 *Tipo captura:*
 ${convenio.tipo_captura}
 
 📄 *Referencias:*
@@ -68,7 +68,7 @@ ${convenio.sigla}
 🖥️ *Modalidad:*
 ${convenio.modalidad}
 
-⌨️ *Dato captura:*
+📊 *Dato captura:*
 ${convenio.dato_captura}
 
 📝 *Descripción recaudo:*
