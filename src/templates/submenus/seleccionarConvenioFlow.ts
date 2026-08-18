@@ -12,31 +12,76 @@ const __dirname = dirname(__filename);
 export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
   .addAction(async (ctx, { state, flowDynamic }) => {
     const myState = state.getMyState();
-    const coincidencias: { nombre_convenio: string; banco: string; codigo_convenio?: string }[] = myState.listaConvenios || [];
+    
+    // Si viene de una búsqueda nueva, guardamos toda la lista y ponemos la página en 0
+    const listaCompleta = myState.listaConveniosOriginal || myState.listaConvenios || [];
+    const pagina = myState.paginaConvenios || 0;
+    const porPagina = 50; // 50 convenios por página para evitar que el mensaje sea gigante y cause error 400
 
-    let mensaje = `🔎 Encontré *${coincidencias.length}* coincidencias:\n\n`;
-    coincidencias.forEach((item: { nombre_convenio: string; banco: string }, index: number) => {
-      mensaje += `*${index + 1}.* ${item.nombre_convenio}\n🏦 ${item.banco}\n\n`;
+    const inicio = pagina * porPagina;
+    const fin = inicio + porPagina;
+    const sliceConvenios = listaCompleta.slice(inicio, fin);
+
+    let mensaje = `🔎 Encontré *${listaCompleta.length} total* coincidencias (Página ${pagina + 1} de ${Math.ceil(listaCompleta.length / porPagina)}):\n\n`;
+    
+    sliceConvenios.forEach((item: any, index: number) => {
+      // El número real en la lista global (ej: 1, 2... o 11, 12...)
+      const numeroReal = inicio + index + 1;
+      mensaje += `*${numeroReal}.* ${item.nombre_convenio}\n🏦 ${item.banco}\n\n`;
     });
+
     mensaje += "✍️ Escribe el número del convenio que deseas seleccionar.";
     
+    if (fin < listaCompleta.length) {
+      mensaje += "\n\n➡️ Escribe *MAS* para ver los siguientes resultados.";
+    }
+
+    // Actualizamos el estado guardando la lista original intacta y la página
+    await state.update({ 
+      listaConveniosOriginal: listaCompleta,
+      listaConvenios: sliceConvenios, // Los que están activos para seleccionar en esta página
+      paginaConvenios: pagina 
+    });
+
     await flowDynamic(mensaje);
   })
   .addAnswer(
-    "", // El texto ya se mandó en el addAction
+    "", 
     { capture: true },
     async (ctx, { state, flowDynamic, fallBack, gotoFlow }) => {
       const myState = state.getMyState();
-      const coincidencias = myState.listaConvenios || [];
-      const textoIngresado = ctx.body.trim();
-      const numero = parseInt(textoIngresado);
+      const textoIngresado = ctx.body.trim().toLowerCase();
 
-      // Validación a prueba de fallos para seleccionar el convenio de la lista
-      if (isNaN(numero) || numero < 1 || numero > coincidencias.length) {
-        return fallBack("❌ Número inválido. Por favor, escribe un número de la lista.");
+      // Si el usuario escribe "mas" y hay más páginas
+      if (textoIngresado === "mas" || textoIngresado === "más") {
+        const listaCompleta = myState.listaCompletaConvenios || myState.listaConveniosOriginal || [];
+        const pagina = (myState.paginaConvenios || 0) + 1;
+        const porPagina = 50;
+
+        if (pagina * porPagina < listaCompleta.length) {
+          await state.update({ paginaConvenios: pagina, listaConvenios: listaCompleta });
+          return gotoFlow(seleccionarConvenioFlow);
+        } else {
+          await flowDynamic("⚠️ No hay más resultados en la lista.");
+          return;
+        }
       }
 
-      const convenio = coincidencias[numero - 1];
+      const numero = parseInt(textoIngresado);
+      const coincidenciasActivas = myState.listaConvenios || [];
+
+      if (isNaN(numero) || numero < 1) {
+        return fallBack("❌ Número inválido. Por favor, escribe un número de la lista o escribe *MAS*.");
+      }
+
+      // Buscamos en la lista completa el índice exacto
+      const listaCompleta = myState.listaConveniosOriginal || coincidenciasActivas;
+      const convenio = listaCompleta[numero - 1];
+
+      if (!convenio) {
+        return fallBack("❌ El número seleccionado no está en el rango de la lista.");
+      }
+
       await flowDynamic(formatearConvenio(convenio));
 
       const rutaImagen = resolve(__dirname, "images", `${convenio.codigo_convenio}.png`);
@@ -44,12 +89,10 @@ export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
         await flowDynamic([{ body: "📷 *Instructivo para realizar el recaudo.*", media: rutaImagen }]);
       }
 
-      await state.update({ listaConvenios: null }); // Limpiamos la memoria
+      await state.update({ listaConvenios: null, listaConveniosOriginal: null, paginaConvenios: null });
       
-      // 🚦 Pausa de 2 segundos para asegurar que la imagen llegue antes que el menú
       await new Promise((resolve) => setTimeout(resolve, 2000));
       
-      // Enviamos el menú de texto plano solicitado
       await flowDynamic(
         "✍️ *Escribe el número de tu opción (1, 2 o 3)* para continuar:\n\n" +
         "1️⃣ 🔄 Buscar\n" +
