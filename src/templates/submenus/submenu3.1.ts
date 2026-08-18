@@ -31,11 +31,12 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
         }
     )
     .addAnswer(
-        "Marca a qué departamento quieres enviar la requisición:\n\n" +
+        "Marca a qué *departamento* quieres enviar la requisición:\n\n" +
         "1. 📦 Logística\n" +
-        "2. 💰 Compras\n" +
+        "2. 👤 RRHH\n" +
         "3. 💻 IT/Sistemas\n" +
-        "4. Otros",
+        "4. 💰 Comercial\n" +
+        "5. 🤔 Otros",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
             const opcion = ctx.body.trim();
@@ -46,16 +47,19 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
                     departamento = 'Logística';
                     break;
                 case '2':
-                    departamento = 'Compras';
+                    departamento = 'RRHH';
                     break;
                 case '3':
                     departamento = 'Tic';
                     break;
                 case '4':
+                    departamento = 'Comercial';
+                    break;
+                case '5':
                     departamento = 'Otros';
                     break;
                 default:
-                    await flowDynamic("❌ Opción no válida. Por favor responde con 1, 2, 3 o 4.");
+                    await flowDynamic("❌ Opción no válida. Por favor responde con 1, 2, 3, 4 o 5.");
                     return null;
             }
 
@@ -65,7 +69,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     )
     // Flujos condicionales para cada departamento
     .addAnswer(
-        "📌 Mencione el código de costo o si es administrativo:",
+        "⚠️ Mencione el *código de punto de venta* o si es *administrativo*:",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
             await state.update({ codigo_costo: ctx.body });
@@ -73,7 +77,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
         }
     )
     .addAnswer(
-        "🏬 Mencione el código de punto de venta o si es administrativo marque 0000:",
+        "⚠️ Mencione el *código de punto de venta* o si es *administrativo marque 0000*:",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
             await state.update({ punto_venta: ctx.body });
@@ -82,8 +86,8 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     )
     .addAnswer(
         "Marca de que tipo es tu solicitud:\n\n" +
-        "1. 🛍 Compras\n" +
-        "2. ⚒ Mantenimiento\n" +
+        "1. 🛒 Compras\n" +
+        "2. 🛠️ Mantenimiento\n" +
         "3. 🚕 Transporte\n" +
         "4. 🤔 Otros",
         { capture: true },
@@ -104,10 +108,10 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     )
     .addAnswer(
         "Marca de que tipo es tu Elemento:\n\n" +
-        "1. 🔧 Activo\n" +
-        "2. 📦 Insumo\n" +
+        "1. 💎 Activo\n" +
+        "2. ♻️ Insumo\n" +
         "3. 🛠️ Repuesto\n" +
-        "4. 🧰 Servicio",
+        "4. 💼 Servicio",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
             const opcion = parseInt(ctx.body.trim());
@@ -134,7 +138,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
         }
     )
     .addAnswer(
-        "Indique la cantidad necesaria:",
+        "Indique la cantidad necesaria (*Número*):",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
             const cantidad = parseInt(ctx.body);
@@ -147,7 +151,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
         }
     )
     .addAnswer(
-        "Agregue alguna observación adicional:",
+        "Agregue alguna observación adicional (*Texto*):",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
             await state.update({ observaciones: ctx.body });
@@ -189,9 +193,9 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
                             datos.observaciones
                         ]
                     );
-                } else if (departamento_destino === 'Compras') {
+                } else if (departamento_destino === 'RRHH') {
                     await pool.query(
-                        `INSERT INTO requisiciones_compras (
+                        `INSERT INTO requisiciones_rrhh (
                             usuario_whatsapp,
                             nombre_solicitante,
                             cedula_solicitante,
@@ -208,7 +212,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
                             ctx.from,
                             datos.nombre,
                             datos.cedula,
-                            'Compras',
+                            'RRHH',
                             datos.codigo_costo,
                             datos.punto_venta,
                             datos.tipo_solicitud,
@@ -247,9 +251,38 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
                             datos.observaciones
                         ]
                     );
+                } else if (departamento_destino === 'Comercial') {
+                    await pool.query(
+                        `INSERT INTO requisiciones_comercial (
+                            usuario_whatsapp,
+                            nombre_solicitante,
+                            cedula_solicitante,
+                            'departamento_origen',
+                            codigo_costo,
+                            punto_venta,
+                            tipo_solicitud,
+                            tipo_elemento,
+                            descripcion,
+                            cantidad,
+                            observaciones
+                        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+                        [
+                            ctx.from,
+                            datos.nombre,
+                            datos.cedula,
+                            'Comercial',
+                            datos.codigo_costo,
+                            datos.punto_venta,
+                            datos.tipo_solicitud,
+                            datos.tipo_elemento,
+                            datos.descripcion,
+                            datos.cantidad,
+                            datos.observaciones
+                        ]
+                    );
                 }
 
-                await flowDynamic("✅ *Solicitud guardada exitosamente*");
+                await flowDynamic("✅ Solicitud guardada exitosamente");
 
             } catch (error) {
                 console.error("Error al guardar:", error);
