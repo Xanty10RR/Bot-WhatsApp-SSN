@@ -15,7 +15,13 @@ export const pool = new Pool({
 
 export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
   .addAnswer(
-    "🔐 Por favor ingresa tu usuario y contraseña separados por una coma. \nEjemplo:`usuario,1234`",
+    [
+      "🔐 Por favor ingresa tu usuario y contraseña separados por una coma.",
+      "Ejemplo: `usuario,1234`",
+      "",
+      "💡 *¿Usuario invitado?* Ingresa: `usuarioinvitado,usuarioinvitado`",
+      "*(Recuerda crear una requisición antes de aprobarla)*",
+    ].join("\n"),
     { capture: true },
     async (ctx, { state, flowDynamic, gotoFlow }) => {
       const partes = ctx.body.split(",");
@@ -38,6 +44,39 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
 
       const [usuarioIngresado, claveIngresada] = partes.map((p) => p.trim());
       try {
+        // Lógica para: usuarioinvitado
+        if (
+          usuarioIngresado === "usuarioinvitado" &&
+          claveIngresada === "usuarioinvitado"
+        ) {
+          // Si es invitado, ignoramos el filtro de departamento para que vea todo
+          const registros = await pool.query(
+            "SELECT * FROM requisiciones WHERE estado = 'pendiente'",
+          );
+          const filas = registros.rows;
+
+          if (filas.length === 0) {
+            await flowDynamic("📭 No hay requisiciones pendientes.");
+            return gotoFlow(mainFlow);
+          }
+
+          await state.update({
+            usuario: "invitado",
+            tablaAsignada: "requisiciones",
+            registros: filas,
+          });
+
+          const opciones = filas.map(
+            (f, i) => `${i + 1}. ${f.nombre_solicitante} - ${f.tipo_solicitud}`,
+          );
+          await flowDynamic([
+            "✅ Modo Invitado activo. Registros disponibles:",
+            ...opciones,
+          ]);
+          return;
+        }
+
+        // Lógica de jefe real
         const result = await pool.query(
           "SELECT * FROM usuarios_aprobadores WHERE usuario = $1",
           [usuarioIngresado],
