@@ -104,7 +104,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           ...opciones,
         ]);
         await flowDynamic(
-          "✏️ Escribe el número del registro que deseas ver en detalle.",
+          "✏️ Escribe el *número del registro* que deseas ver en detalle.",
         );
       } catch (error) {
         console.error("Error al verificar identidad:", error);
