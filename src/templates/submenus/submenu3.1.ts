@@ -24,7 +24,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
         "Marca a qué *departamento* quieres enviar la requisición:\n\n1. 📦 Logística\n2. 👤 RRHH\n3. 💻 IT/Sistemas\n4. 💰 Comercial\n5. 🤔 Otros",
         { capture: true },
         async (ctx, { flowDynamic, state }) => {
-            const mapaDept: Record<string, string> = { '1': 'Logística', '2': 'RRHH', '3': 'Tic', '4': 'Comercial', '5': 'Otros' };
+            const mapaDept: Record<string, string> = { '1': 'Logística', '2': 'RRHH', '3': 'TIC', '4': 'Comercial', '5': 'Otros' };
             const departamento = mapaDept[ctx.body.trim()];
             
             if (!departamento) return await flowDynamic("❌ Opción no válida. Por favor responde con 1, 2, 3, 4 o 5.");
