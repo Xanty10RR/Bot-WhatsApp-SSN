@@ -6,11 +6,11 @@ import { mainFlow } from "../mainFlow";
 
 // Configuración de PostgreSQL
 export const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: Number(process.env.DB_PORT) || 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: Number(process.env.DB_PORT) || 5432,
 });
 
 export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
@@ -74,9 +74,13 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           return;
         }
 
-        // ✅ Autenticación exitosa y mostrar registros
+        // Autenticación exitosa y mostrar registros
         const tablaAsignada = usuario.tabla_asignada;
-        const registros = await pool.query(`SELECT * FROM ${tablaAsignada}`);
+        const deptoJefe = usuario.departamento; // Obtenemos el departamento del jefe desde la BD
+
+        // AHORA filtramos por el departamento del jefe
+        const query = `SELECT * FROM ${tablaAsignada} WHERE departamento = $1 AND estado = 'pendiente'`;
+        const registros = await pool.query(query, [deptoJefe]);
         const filas = registros.rows;
 
         if (filas.length === 0) {
@@ -272,5 +276,4 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
     if (ctx.body.includes("Menú") || ctx.body.includes("🏠")) {
       return gotoFlow(mainFlow);
     }
-  }
-);
+  });
