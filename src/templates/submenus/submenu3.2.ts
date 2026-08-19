@@ -90,7 +90,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
 
         const opciones = filas.map(
           (fila, i) =>
-            `${i + 1}. ${fila[Object.keys(fila)[0]]} - ${fila[Object.keys(fila)[1]]}`,
+            `${i + 1}. ${fila.nombre_solicitante} - ${fila.tipo_solicitud}`,
         );
 
         await state.update({
