@@ -15,14 +15,14 @@ export const pool = new Pool({
 
 export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
   .addAnswer(
-    "🔐 Por favor ingresa tu usuario y contraseña separados por una coma. Ejemplo:\n`soporte,1234`",
+    "🔐 Por favor ingresa tu usuario y contraseña separados por una coma. \nEjemplo:`usuario,1234`",
     { capture: true },
     async (ctx, { state, flowDynamic }) => {
       const partes = ctx.body.split(",");
 
       if (partes.length !== 2) {
         await flowDynamic(
-          "❌ Formato inválido. Usa el formato: usuario,contraseña",
+          "❌ Formato inválido. Usa el *formato*:\nusuario, contraseña",
         );
         await flowDynamic([
           {
