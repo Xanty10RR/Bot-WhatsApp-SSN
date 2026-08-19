@@ -73,6 +73,9 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
             "✅ *Modo invitado activado*.\nRegistros disponibles:",
             ...opciones,
           ]);
+          await flowDynamic(
+            "✏️ Escribe el *número del registro* que deseas ver en detalle.",
+          );
           return;
         }
 
