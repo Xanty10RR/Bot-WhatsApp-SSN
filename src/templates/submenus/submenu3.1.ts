@@ -63,7 +63,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     },
   )
   .addAnswer(
-    "⚠️ Si usted es *ASESOR* escriba el *código de punto de venta* o si usted es *administrativo* marque *0*:",
+    "⚠️ Si usted es *ASESOR* escriba el *código de punto de venta* o si usted es *administrativo* marque *000*:",
     { capture: true },
     async (ctx, { flowDynamic, state }) => {
       const input = ctx.body.trim();
