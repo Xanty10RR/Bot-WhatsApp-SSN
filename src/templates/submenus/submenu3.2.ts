@@ -17,7 +17,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
   .addAnswer(
     "🔐 Por favor ingresa tu usuario y contraseña separados por una coma. \nEjemplo:`usuario,1234`",
     { capture: true },
-    async (ctx, { state, flowDynamic }) => {
+    async (ctx, { state, flowDynamic, gotoFlow }) => {
       const partes = ctx.body.split(",");
 
       if (partes.length !== 2) {
@@ -85,7 +85,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
 
         if (filas.length === 0) {
           await flowDynamic("📭 No hay registros en tu tabla asignada.");
-          return { gotoFlow: mainFlow };
+          return gotoFlow(mainFlow);
         }
 
         const opciones = filas.map(
