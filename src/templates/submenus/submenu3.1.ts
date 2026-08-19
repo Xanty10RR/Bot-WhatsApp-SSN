@@ -30,7 +30,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   )
   .addAnswer(
     [
-      "Marca a qué *departamento* quieres enviar la requisición:",
+      "Marca el número del *departamento* donde quieres enviar la requisición:",
       "",
       "1. 📦 Logística",
       "2. 👤 RRHH",
@@ -63,7 +63,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     },
   )
   .addAnswer(
-    "⚠️ Si es Asesor escriba el *código de punto de venta* o si es *administrativo marque 0000*:",
+    "⚠️ Si usted es *ASESOR* escriba el *código de punto de venta* o si usted es *administrativo* marque *0*:",
     { capture: true },
     async (ctx, { flowDynamic, state }) => {
       const input = ctx.body.trim();
@@ -77,11 +77,11 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   )
   .addAnswer(
     [
-      "Marca de qué tipo es tu solicitud:",
+      "Marca de qué *tipo es tu solicitud*:",
       "1. 🛒 Compras",
       "2. 🛠️ Mantenimiento",
-      "3. 🚗 Transporte",
-      "4. 🤖 Otros",
+      "3. 🚕 Transporte",
+      "4. 🤔 Otros",
     ].join("\n"),
     { capture: true },
     async (ctx, { flowDynamic, state, fallBack }) => {
@@ -104,7 +104,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   )
   .addAnswer(
     [
-      "Marca de qué tipo es tu Elemento:",
+      "Marca de qué *tipo es tu Elemento:*",
       "1. 💎 Activo",
       "2. ♻️ Insumo",
       "3. 🛠️ Repuesto",
@@ -128,14 +128,14 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     },
   )
   .addAnswer(
-    "Por favor escriba una descripción detallada:",
+    "Por favor escriba una *descripción detallada*:",
     { capture: true },
     async (ctx, { state }) => {
       await state.update({ descripcion: ctx.body });
     },
   )
   .addAnswer(
-    "Indique la cantidad necesaria:",
+    "Indique la *cantidad necesaria*:",
     { capture: true },
     async (ctx, { flowDynamic, state }) => {
       // Validamos que sea un número
@@ -147,7 +147,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     },
   )
   .addAnswer(
-    "Agregue alguna observación adicional:",
+    "Agregue alguna *observación adicional*:",
     { capture: true },
     async (ctx, { state }) => {
       await state.update({ observaciones: ctx.body });
