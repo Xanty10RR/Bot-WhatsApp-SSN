@@ -16,10 +16,10 @@ export const pool = new Pool({
 export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
   .addAnswer(
     [
-      "🔐 Por favor ingresa tu usuario y contraseña separados por una coma.",
+      "🔐 *¿Usuario real?*\nIngresa tu usuario y contraseña separados por una coma.",
       "Ejemplo: `usuario,1234`",
       "",
-      "💡 *¿Usuario invitado?* Ingresa: `usuarioinvitado,usuarioinvitado`",
+      "💡 *¿Usuario invitado?*\nIngresa con las credenciales: `usuarioinvitado,usuarioinvitado` para ingresar",
       "*(Recuerda crear una requisición antes de aprobarla)*",
     ].join("\n"),
     { capture: true },
@@ -70,7 +70,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
             (f, i) => `${i + 1}. ${f.nombre_solicitante} - ${f.tipo_solicitud}`,
           );
           await flowDynamic([
-            "✅ Modo Invitado activo. Registros disponibles:",
+            "✅ *Modo invitado activado*.\nRegistros disponibles:",
             ...opciones,
           ]);
           return;
