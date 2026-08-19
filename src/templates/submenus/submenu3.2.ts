@@ -79,7 +79,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           return;
         }
 
-        // Lógica de jefe real
+        // Lógica para: jefes reales de la empresa
         const result = await pool.query(
           "SELECT * FROM usuarios_aprobadores WHERE usuario = $1",
           [usuarioIngresado],
