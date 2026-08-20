@@ -2,7 +2,7 @@ import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
 
 export const submenu3Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION3)
-    .addAnswer("Este proceso pertenece a logística", { capture: false })
+    .addAnswer("", { capture: false })
     .addAction(async (ctx, { provider }) => {
         const list = {
             header: { 
@@ -10,7 +10,7 @@ export const submenu3Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION3)
                 text: "Gestión de requisiciones" 
             },
             body: { 
-                text: "Selecciona la acción que deseas realizar:" 
+                text: "Este proceso pertenece a *logística*.\nSelecciona la acción que deseas realizar:" 
             },
             footer: { 
                 text: "Equipo de Logística" 
