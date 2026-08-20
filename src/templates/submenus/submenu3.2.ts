@@ -17,7 +17,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
   .addAnswer(
     [
       "🔐 *¿Usuario real?*\nIngresa tu usuario y contraseña separados por una coma.",
-      "Ejemplo: `usuario,1234`",
+      "Ejemplo: `usuario,contraseña`",
       "",
       "💡 *¿Usuario invitado?*\nIngresa con las credenciales: `usuarioinvitado,usuarioinvitado` para ingresar",
       "*(Recuerda crear una requisición antes de aprobarla)*",
@@ -70,7 +70,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
             (f, i) => `${i + 1}. ${f.nombre_solicitante} - ${f.tipo_solicitud}`,
           );
           await flowDynamic([
-            "✅ *Modo invitado activado*.\nRegistros disponibles:",
+            "✅ *Modo invitado activado*\nRegistros disponibles:",
             ...opciones,
           ]);
           await flowDynamic(
@@ -163,159 +163,149 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
       }
     },
   )
+  // 👇 AQUÍ AGREGAMOS ESTE PASO EXTRA PARA CAPTURAR EL NÚMERO Y MOSTRAR EL DETALLE BONITO
+  // 1. Captura el número del registro, muestra el detalle y CAPTURA DIRECTAMENTE LA ACCIÓN (1, 2, 3 o 4)
+  // PASO 1: Captura el número de la lista (1, 2, 3...) y muestra el detalle + opciones
+  .addAnswer("", { capture: true }, async (ctx, { state, flowDynamic }) => {
+    const registros = (await state.get("registros")) || [];
+    const indice = parseInt(ctx.body.trim()) - 1;
+
+    if (isNaN(indice) || indice < 0 || indice >= registros.length) {
+      await flowDynamic(
+        "❌ Número inválido. Por favor escribe un número de la lista.",
+      );
+      return;
+    }
+
+    const registro = registros[indice];
+    const segundoValor = Object.values(registro)[1];
+
+    await state.update({
+      selectedRegistro: registro,
+      numeroSolicitante: segundoValor,
+    });
+
+    // Burbuja 1: Detalles
+    const mensajeDetalle = [
+      "📄 *Detalles del registro seleccionado:*",
+      "",
+      `👤 *Solicitante:* ${registro.nombre_solicitante}`,
+      `🆔 *Cédula:* ${registro.cedula_solicitante}`,
+      `🏢 *Departamento:* ${registro.departamento}`,
+      `📌 *Tipo:* ${registro.tipo_solicitud} (${registro.tipo_elemento})`,
+      `📦 *Cantidad:* ${registro.cantidad}`,
+      `📝 *Descripción:* ${registro.descripcion}`,
+      `⚠️ *Observaciones:* ${registro.observaciones || "Ninguna"}`,
+      `🕒 *Fecha:* ${new Date(registro.fecha_creacion).toLocaleDateString("es-CO")}`,
+    ].join("\n");
+
+    await flowDynamic(mensajeDetalle);
+
+    // Burbuja 2: Menú de acciones
+    await flowDynamic(
+      [
+        "🔍 *Selecciona una acción:*",
+        "1. ✅ Aprobar",
+        "2. ❌ Rechazar",
+        "3. 🔍 Ver número",
+        "4. 🏠 Menú principal",
+      ].join("\n"),
+    );
+  })
+  // PASO 2: Captura inmediatamente la respuesta al menú (1, 2, 3 o 4)
   .addAnswer(
     "",
     { capture: true },
     async (ctx, { state, flowDynamic, gotoFlow }) => {
-      const seleccion = parseInt(ctx.body.trim().replace(/\D/g, ""));
-      const registros = await state.get("registros");
-
-      if (
-        !registros ||
-        isNaN(seleccion) ||
-        seleccion < 1 ||
-        seleccion > registros.length
-      ) {
-        await flowDynamic("❌ Selección inválida. Volviendo al menú...");
-        return { gotoFlow: mainFlow };
-      }
-
-      const fila = registros[seleccion - 1];
-      const segundoValor = Object.values(fila)[1];
-      const detalle = Object.entries(fila)
-        .map(([clave, valor]) => `🔹 ${clave}: ${valor}`)
-        .join("\n");
-
-      await state.update({
-        selectedRegistro: fila,
-        numeroSolicitante: segundoValor,
-      });
-
-      await flowDynamic(`📄 Detalles del registro seleccionado:\n${detalle}`);
-      await flowDynamic(
-        [
-          "🔍 Selecciona una acción:",
-          "1. ✅ Aprobar",
-          "2. ❌ Rechazar",
-          "3. 📞 Ver número",
-          "4. 🏠 Menú principal",
-        ].join("\n"),
-      );
-    },
-  )
-
-  .addAction(
-    { capture: true },
-    async (ctx, { state, flowDynamic, gotoFlow }) => {
       try {
         const opcion = parseInt(ctx.body.trim().replace(/\D/g, ""));
-        const { numeroSolicitante, selectedRegistro, tablaAsignada, usuario } =
-          await state.getMyState();
+        const stateData = await state.getMyState();
+        const selectedRegistro = stateData?.selectedRegistro;
+        const tablaAsignada = stateData?.tablaAsignada;
+        const usuario = stateData?.usuario;
+        const numeroSolicitante = stateData?.numeroSolicitante;
+
+        if (!selectedRegistro) {
+          await flowDynamic(
+            "❌ No hay un registro seleccionado. Por favor, comienza de nuevo.",
+          );
+          return gotoFlow(mainFlow);
+        }
 
         if (isNaN(opcion) || opcion < 1 || opcion > 4) {
-          throw new Error("Opción inválida");
-        }
-        // Validación de opción
-        if (isNaN(opcion) || opcion < 1 || opcion > 4) {
-          throw new Error("Opción inválida");
+          await flowDynamic("❌ Opción inválida. Elige un número del 1 al 4.");
+          return;
         }
 
         switch (opcion) {
           case 1: {
-            // Aprobar - Nota los {} que crean un nuevo ámbito
-            const estado = "aprobado";
             const idRegistro = selectedRegistro.id;
-
             await pool.query(
-              `
-                        INSERT INTO registro_aprobaciones (
-                            datos_completos,
-                            estado,
-                            aprobador,
-                            tabla_origen,
-                            fecha_decision
-                        ) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
+              `INSERT INTO registro_aprobaciones (datos_completos, estado, aprobador, tabla_origen, fecha_decision) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
               [
                 JSON.stringify(selectedRegistro),
-                estado,
+                "aprobado",
                 usuario,
                 tablaAsignada,
               ],
             );
-            await pool.query(
-              `
-                        DELETE FROM ${tablaAsignada}
-                        WHERE id = $1`,
-              [idRegistro],
-            );
-
+            await pool.query(`DELETE FROM ${tablaAsignada} WHERE id = $1`, [
+              idRegistro,
+            ]);
             await flowDynamic(
-              "🟢 Solicitud aprobada y guardada en base de datos",
+              "🟢 Solicitud aprobada y guardada en base de datos.",
             );
-            break;
+            return gotoFlow(mainFlow);
           }
-
           case 2: {
-            // Rechazar - Nota los {} que crean un nuevo ámbito
-            const estado = "rechazado";
             const idRegistro = selectedRegistro.id;
-
             await pool.query(
-              `
-                        INSERT INTO registro_aprobaciones (
-                            datos_completos,
-                            estado,
-                            aprobador,
-                            tabla_origen,
-                            fecha_decision
-                        ) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
+              `INSERT INTO registro_aprobaciones (datos_completos, estado, aprobador, tabla_origen, fecha_decision) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
               [
                 JSON.stringify(selectedRegistro),
-                estado,
+                "rechazado",
                 usuario,
                 tablaAsignada,
               ],
             );
-            await pool.query(
-              `
-                        DELETE FROM ${tablaAsignada}
-                        WHERE id = $1`,
-              [idRegistro],
-            );
-
+            await pool.query(`DELETE FROM ${tablaAsignada} WHERE id = $1`, [
+              idRegistro,
+            ]);
             await flowDynamic(
-              "🔴 Solicitud rechazada y guardada en base de datos",
+              "🔴 Solicitud rechazada y guardada en base de datos.",
             );
-            break;
+            return gotoFlow(mainFlow);
           }
-
-          case 3: // Ver número
+          case 3: {
             if (!numeroSolicitante) {
-              throw new Error("No se encontró número de contacto");
+              await flowDynamic("❌ No se encontró número de contacto.");
+              break;
             }
             await flowDynamic(
               `📱 Número del solicitante:\n${numeroSolicitante}`,
             );
-            break;
 
-          case 4: // Menú principal
+            // Volvemos a mostrar el menú de acciones para que el usuario no pierda el hilo
+            await flowDynamic(
+              [
+                "🔍 *Selecciona una acción:*",
+                "1. ✅ Aprobar",
+                "2. ❌ Rechazar",
+                "3. 🔍 Ver número",
+                "4. 🏠 Menú principal",
+              ].join("\n"),
+            );
+            return; // Mantiene la captura abierta esperando que elijas otra opción
+          }
+          case 4:
             return gotoFlow(mainFlow);
         }
       } catch (error) {
         console.error("Error en acción:", error);
         await flowDynamic(
-          "❌ Ocurrió un error al procesar. Volviendo al menú...",
+          "❌ Ocurrió un error al procesar en la base de datos.",
         );
+        return gotoFlow(mainFlow);
       }
-
-      return gotoFlow(mainFlow);
     },
-  )
-  .addAction({ capture: true }, async (ctx, { gotoFlow }) => {
-    if (ctx.body.includes("Otro") || ctx.body.includes("🔁")) {
-      return gotoFlow(VerificarIdentidad);
-    }
-    if (ctx.body.includes("Menú") || ctx.body.includes("🏠")) {
-      return gotoFlow(mainFlow);
-    }
-  });
+  );
