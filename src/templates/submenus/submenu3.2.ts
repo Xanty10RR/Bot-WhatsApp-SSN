@@ -35,7 +35,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
             body: "¿Qué deseas hacer ahora?",
             buttons: [
               { body: "🔁 Otro intento" },
-              { body: "🏠 Menú principal" },
+              { body: "🏠 Menú" },
             ],
           },
         ]);
@@ -49,7 +49,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           usuarioIngresado === "usuarioinvitado" &&
           claveIngresada === "usuarioinvitado"
         ) {
-          // Si es invitado, ignoramos el filtro de departamento para que vea todo
+          // Si es invitado, ignoramos el filtro de departamento para que vea todas las requisiciones
           const registros = await pool.query(
             "SELECT * FROM requisiciones WHERE estado = 'pendiente'",
           );
@@ -109,7 +109,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
               body: "¿Qué deseas hacer ahora?",
               buttons: [
                 { body: "🔁 Otro intento" },
-                { body: "🏠 Menú principal" },
+                { body: "🏠 Menú" },
               ],
             },
           ]);
@@ -118,9 +118,11 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
 
         // Autenticación exitosa y mostrar registros
         const tablaAsignada = usuario.tabla_asignada;
-        const deptoJefe = usuario.departamento; // Obtenemos el departamento del jefe desde la BD
 
-        // AHORA filtramos por el departamento del jefe
+        // Se obtiene el departamento del jefe desde la BD
+        const deptoJefe = usuario.departamento;
+
+        // AHORA se filtra por el departamento del jefe
         const query = `SELECT * FROM ${tablaAsignada} WHERE departamento = $1 AND estado = 'pendiente'`;
         const registros = await pool.query(query, [deptoJefe]);
         const filas = registros.rows;
@@ -156,16 +158,15 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
             body: "¿Qué deseas hacer ahora?",
             buttons: [
               { body: "🔁 Otro intento" },
-              { body: "🏠 Menú principal" },
+              { body: "🏠 Menú" },
             ],
           },
         ]);
       }
     },
   )
-  // 👇 AQUÍ AGREGAMOS ESTE PASO EXTRA PARA CAPTURAR EL NÚMERO Y MOSTRAR EL DETALLE BONITO
-  // 1. Captura el número del registro, muestra el detalle y CAPTURA DIRECTAMENTE LA ACCIÓN (1, 2, 3 o 4)
-  // PASO 1: Captura el número de la lista (1, 2, 3...) y muestra el detalle + opciones
+  
+  // Captura el número y muestra el detalle + opciones
   .addAnswer("", { capture: true }, async (ctx, { state, flowDynamic }) => {
     const registros = (await state.get("registros")) || [];
     const indice = parseInt(ctx.body.trim()) - 1;
@@ -185,23 +186,26 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
       numeroSolicitante: segundoValor,
     });
 
-    // Burbuja 1: Detalles
+    // Datos de equisicion formateada
     const mensajeDetalle = [
       "📄 *Detalles del registro seleccionado:*",
       "",
       `👤 *Solicitante:* ${registro.nombre_solicitante}`,
+      `📱 *Teléfono:* ${registro.usuario_whatsapp}`,
       `🪪 *Cédula:* ${registro.cedula_solicitante}`,
       `🏢 *Departamento:* ${registro.departamento}`,
-      `📌 *Tipo:* ${registro.tipo_solicitud} (${registro.tipo_elemento})`,
-      `📦 *Cantidad:* ${registro.cantidad}`,
+      `⚠️ *Punto de venta o administrativo:* ${registro.asesor_o_administrativo}`,
+      `📌 *Tipo de solicitud:* ${registro.tipo_solicitud}`,
+      `🔰 *Tipo de elemento:* ${registro.tipo_elemento}`,
       `📝 *Descripción:* ${registro.descripcion}`,
-      `⚠️ *Observaciones:* ${registro.observaciones || "Ninguna"}`,
-      `🕒 *Fecha:* ${new Date(registro.fecha_creacion).toLocaleDateString("es-CO")}`,
+      `📦 *Cantidad:* ${registro.cantidad}`,
+      `💬 *Observaciones:* ${registro.observaciones || "Ninguna"}`,
+      `📝 *Estado:* ${registro.estado || "Pendiente"}`,
+      `🕒 *Fecha y hora:* ${new Date(registro.fecha_creacion).toLocaleDateString("es-CO")}`,
     ].join("\n");
 
     await flowDynamic(mensajeDetalle);
 
-    // Burbuja 2: Menú de acciones
     await flowDynamic(
       [
         "🔍 *Selecciona una acción:*",
@@ -212,7 +216,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
       ].join("\n"),
     );
   })
-  // PASO 2: Captura inmediatamente la respuesta al menú (1, 2, 3 o 4)
+  // Captura inmediatamente la respuesta al menú (1, 2, 3 o 4)
   .addAnswer(
     "",
     { capture: true },
@@ -285,7 +289,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
               `📱 Número del solicitante:\n${numeroSolicitante}`,
             );
 
-            // Volvemos a mostrar el menú de acciones para que el usuario no pierda el hilo
+            // Muestra el menú de acciones para seguir en la aprobacion/rechazo de la requisicion sin salir del flujo
             await flowDynamic(
               [
                 "🔍 *Selecciona una acción:*",
@@ -295,7 +299,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
                 "4. 🏠 Menú principal",
               ].join("\n"),
             );
-            return; // Mantiene la captura abierta esperando que elijas otra opción
+            return; // Mantiene la captura abierta esperando que elijas otra opcion
           }
           case 4:
             return gotoFlow(mainFlow);
