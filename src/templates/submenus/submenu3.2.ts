@@ -17,7 +17,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
   .addAnswer(
     [
       "🔐 *¿Usuario real?*\nIngresa tu usuario y contraseña separados por una coma.",
-      "Ejemplo: `usuario,contraseña`",
+      "Ejemplo: `usuario, contraseña`",
       "",
       "💡 *¿Usuario invitado?*\nIngresa con las credenciales: `usuarioinvitado, usuarioinvitado` para ingresar",
       "*(Recuerda crear una requisición antes de aprobarla)*",
