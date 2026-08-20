@@ -190,7 +190,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
       "📄 *Detalles del registro seleccionado:*",
       "",
       `👤 *Solicitante:* ${registro.nombre_solicitante}`,
-      `🆔 *Cédula:* ${registro.cedula_solicitante}`,
+      `🪪 *Cédula:* ${registro.cedula_solicitante}`,
       `🏢 *Departamento:* ${registro.departamento}`,
       `📌 *Tipo:* ${registro.tipo_solicitud} (${registro.tipo_elemento})`,
       `📦 *Cantidad:* ${registro.cantidad}`,
