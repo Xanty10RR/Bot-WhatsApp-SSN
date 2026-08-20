@@ -157,13 +157,22 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
     },
   )
 
-  // Captura el número y muestra el detalle + opciones
+  // Captura el número y maneja si el usuario presionó "Otro intento" o "Menú"
   .addAnswer(
     "",
     { capture: true },
-    async (ctx, { state, flowDynamic, fallBack }) => {
+    async (ctx, { state, flowDynamic, fallBack, gotoFlow }) => {
+      const input = ctx.body.trim().toLowerCase();
+
+      // Si el usuario presiona el botón de reintentar o menú, redirigimos limpiamente
+      if (input.includes("otro intento") || input.includes("reintentar")) {
+        return gotoFlow(VerificarIdentidad);
+      }
+      if (input.includes("menú") || input.includes("menu")) {
+        return gotoFlow(mainFlow);
+      }
+
       const registros = (await state.get("registros")) || [];
-      const input = ctx.body.trim();
 
       // Validar que sea un número estricto
       if (!/^\d+$/.test(input)) {
@@ -220,7 +229,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
       );
     },
   )
-  // Captura inmediatamente la respuesta al menú (1, 2, 3 o 4)
+  // Paso 3: Captura inmediatamente la respuesta al menú de acciones (1, 2, 3 o 4)
   .addAnswer(
     "Elige una opción de acción:",
     { capture: true },
