@@ -189,7 +189,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
       {
         body: "¿Qué deseas hacer ahora?",
         buttons: [
-          { body: "📝 Crear otra" },
+          { body: "📝 Nueva" },
           { body: "🏠 Menú" },
         ],
       },
