@@ -76,12 +76,12 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     },
   )
   .addAnswer(
-    "⚠️ Si usted es *ASESOR* escriba el *código de punto de venta* o si usted es *ADMINISTRATIVO* marque *000*:",
+    "⚠️ Si usted es *ASESOR* escriba el *código de punto de venta* o si usted es *ADMINISTRATIVO* marque *000* (_solo números_):",
     { capture: true },
     async (ctx, { state, fallBack }) => {
       const input = ctx.body.trim();
       
-      // Validamos si NO son solo números
+      // Validamos que solo sean números
       if (!/^\d+$/.test(input)) {
         return fallBack("❌ Formato inválido. Debes ingresar solo números. Inténtalo de nuevo:");
       }
@@ -150,13 +150,14 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   .addAnswer(
     "Indique la *cantidad necesaria:*",
     { capture: true },
-    async (ctx, { flowDynamic, state }) => {
-      // Validamos que sea un número
-      if (isNaN(parseInt(ctx.body))) {
-        await flowDynamic("❌ La cantidad debe ser un número.");
-        return;
+    async (ctx, { state, fallBack }) => {
+      const input = ctx.body.trim();
+
+      // Validamos que solo sean números
+      if (!/^\d+$/.test(input)) {
+        return fallBack("❌ Formato inválido. Debes ingresar solo números. Inténtalo de nuevo:");
       }
-      await state.update({ cantidad: parseInt(ctx.body) });
+      await state.update({ cantidad: input });
     },
   )
   .addAnswer(
