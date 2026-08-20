@@ -28,7 +28,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
 
       if (partes.length !== 2) {
         await flowDynamic(
-          "❌ Formato inválido. Usa el *formato*:\nusuario, contraseña",
+          "❌ Formato inválido. Usa el formato:\n*usuario, contraseña*",
         );
         await flowDynamic([
           {
@@ -89,7 +89,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
               body: "¿Qué deseas hacer ahora?",
               buttons: [
                 { body: "🔁 Otro intento" },
-                { body: "🏠 Menú principal" },
+                { body: "🏠 Menú" },
               ],
             },
           ]);
