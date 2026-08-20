@@ -15,17 +15,31 @@ export const pool = new Pool({
 
 export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   .addAnswer(
-    "¡Vamos a crear una nueva requisición!.\nPor favor, dime tu *nombre completo:*",
+    "¡Vamos a crear una nueva requisición!.\nPor favor, dime tu *nombre completo* (_solo texto_):",
     { capture: true },
-    async (ctx, { state }) => {
-      await state.update({ nombre: ctx.body });
+    async (ctx, { state, fallBack }) => {
+      const nombre = ctx.body.trim();
+
+      // Validar si el texto contiene algún número (0 al 9)
+      if (/\d/.test(nombre)) {
+        return fallBack("❌ El nombre no debe contener números. Por favor, escribe tu nombre completo solo con letras:");
+      }
+
+      await state.update({ nombre });
     },
   )
   .addAnswer(
-    "Por favor coloca tu *número de cédula* completo:",
+    "Por favor coloca tu *número de cédula* completo (_solo números_):",
     { capture: true },
-    async (ctx, { state }) => {
-      await state.update({ cedula: ctx.body });
+    async (ctx, { state, fallBack }) => {
+      const cedula = ctx.body.trim();
+
+      // Validar que la cédula contenga ÚNICAMENTE números (sin letras, espacios raros ni símbolos)
+      if (!/^\d+$/.test(cedula)) {
+        return fallBack("❌ La cédula debe contener únicamente números. Por favor, ingrésala de nuevo:");
+      }
+
+      await state.update({ cedula });
     },
   )
   .addAnswer(
@@ -64,13 +78,14 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   .addAnswer(
     "⚠️ Si usted es *ASESOR* escriba el *código de punto de venta* o si usted es *ADMINISTRATIVO* marque *000*:",
     { capture: true },
-    async (ctx, { flowDynamic, state }) => {
+    async (ctx, { state, fallBack }) => {
       const input = ctx.body.trim();
+      
+      // Validamos si NO son solo números
       if (!/^\d+$/.test(input)) {
-        return await flowDynamic(
-          "❌ Formato inválido. Debes ingresar solo números.",
-        );
+        return fallBack("❌ Formato inválido. Debes ingresar solo números. Inténtalo de nuevo:");
       }
+
       await state.update({ asesor_o_administrativo: input });
     },
   )
