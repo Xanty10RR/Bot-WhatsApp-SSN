@@ -19,7 +19,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
       "🔐 *¿Usuario real?*\nIngresa tu usuario y contraseña separados por una coma.",
       "Ejemplo: `usuario,contraseña`",
       "",
-      "💡 *¿Usuario invitado?*\nIngresa con las credenciales: `usuarioinvitado,usuarioinvitado` para ingresar",
+      "💡 *¿Usuario invitado?*\nIngresa con las credenciales: `usuarioinvitado, usuarioinvitado` para ingresar",
       "*(Recuerda crear una requisición antes de aprobarla)*",
     ].join("\n"),
     { capture: true },
@@ -33,10 +33,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
         await flowDynamic([
           {
             body: "¿Qué deseas hacer ahora?",
-            buttons: [
-              { body: "🔁 Otro intento" },
-              { body: "🏠 Menú" },
-            ],
+            buttons: [{ body: "🔁 Otro intento" }, { body: "🏠 Menú" }],
           },
         ]);
         return;
@@ -107,10 +104,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           await flowDynamic([
             {
               body: "¿Qué deseas hacer ahora?",
-              buttons: [
-                { body: "🔁 Otro intento" },
-                { body: "🏠 Menú" },
-              ],
+              buttons: [{ body: "🔁 Otro intento" }, { body: "🏠 Menú" }],
             },
           ]);
           return;
@@ -156,89 +150,100 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
         await flowDynamic([
           {
             body: "¿Qué deseas hacer ahora?",
-            buttons: [
-              { body: "🔁 Otro intento" },
-              { body: "🏠 Menú" },
-            ],
+            buttons: [{ body: "🔁 Otro intento" }, { body: "🏠 Menú" }],
           },
         ]);
       }
     },
   )
-  
+
   // Captura el número y muestra el detalle + opciones
-  .addAnswer("", { capture: true }, async (ctx, { state, flowDynamic }) => {
-    const registros = (await state.get("registros")) || [];
-    const indice = parseInt(ctx.body.trim()) - 1;
-
-    if (isNaN(indice) || indice < 0 || indice >= registros.length) {
-      await flowDynamic(
-        "❌ Número inválido. Por favor escribe un número de la lista.",
-      );
-      return;
-    }
-
-    const registro = registros[indice];
-    const segundoValor = Object.values(registro)[1];
-
-    await state.update({
-      selectedRegistro: registro,
-      numeroSolicitante: segundoValor,
-    });
-
-    // Datos de equisicion formateada
-    const mensajeDetalle = [
-      "📄 *Detalles del registro seleccionado:*",
-      "",
-      `👤 *Solicitante:* ${registro.nombre_solicitante}`,
-      `📱 *Teléfono:* ${registro.usuario_whatsapp}`,
-      `🪪 *Cédula:* ${registro.cedula_solicitante}`,
-      `🏢 *Departamento:* ${registro.departamento}`,
-      `⚠️ *Punto de venta o administrativo:* ${registro.asesor_o_administrativo}`,
-      `📌 *Tipo de solicitud:* ${registro.tipo_solicitud}`,
-      `🔰 *Tipo de elemento:* ${registro.tipo_elemento}`,
-      `📝 *Descripción:* ${registro.descripcion}`,
-      `📦 *Cantidad:* ${registro.cantidad}`,
-      `💬 *Observaciones:* ${registro.observaciones || "Ninguna"}`,
-      `📝 *Estado:* ${registro.estado || "Pendiente"}`,
-      `🕒 *Fecha y hora:* ${new Date(registro.fecha_creacion).toLocaleDateString("es-CO")}`,
-    ].join("\n");
-
-    await flowDynamic(mensajeDetalle);
-
-    await flowDynamic(
-      [
-        "🔍 *Selecciona una acción:*",
-        "1. ✅ Aprobar",
-        "2. ❌ Rechazar",
-        "3. 🔍 Ver número",
-        "4. 🏠 Menú principal",
-      ].join("\n"),
-    );
-  })
-  // Captura inmediatamente la respuesta al menú (1, 2, 3 o 4)
   .addAnswer(
     "",
     { capture: true },
-    async (ctx, { state, flowDynamic, gotoFlow }) => {
+    async (ctx, { state, flowDynamic, fallBack }) => {
+      const registros = (await state.get("registros")) || [];
+      const input = ctx.body.trim();
+
+      // Validar que sea un número estricto
+      if (!/^\d+$/.test(input)) {
+        return fallBack(
+          "❌ Número inválido. Por favor, escribe un número de la lista:",
+        );
+      }
+
+      const indice = parseInt(input, 10) - 1;
+
+      // Validar que el número esté dentro del rango de la lista mostrada
+      if (indice < 0 || indice >= registros.length) {
+        return fallBack(
+          "❌ Número inválido. Por favor, escribe un número de la lista:",
+        );
+      }
+
+      const registro = registros[indice];
+      const segundoValor = Object.values(registro)[1];
+
+      await state.update({
+        selectedRegistro: registro,
+        numeroSolicitante: segundoValor,
+      });
+
+      // Datos de equisicion formateada
+      const mensajeDetalle = [
+        "📄 *Detalles del registro seleccionado:*",
+        "",
+        `👤 *Solicitante:* ${registro.nombre_solicitante}`,
+        `📱 *Teléfono:* ${registro.usuario_whatsapp}`,
+        `🪪 *Cédula:* ${registro.cedula_solicitante}`,
+        `🏢 *Departamento:* ${registro.departamento}`,
+        `⚠️ *Punto de venta o administrativo:* ${registro.asesor_o_administrativo}`,
+        `📌 *Tipo de solicitud:* ${registro.tipo_solicitud}`,
+        `🔰 *Tipo de elemento:* ${registro.tipo_elemento}`,
+        `📝 *Descripción:* ${registro.descripcion}`,
+        `📦 *Cantidad:* ${registro.cantidad}`,
+        `💬 *Observaciones:* ${registro.observaciones || "Ninguna"}`,
+        `📝 *Estado:* ${registro.estado || "Pendiente"}`,
+        `🕒 *Fecha y hora:* ${new Date(registro.fecha_creacion).toLocaleDateString("es-CO")}`,
+      ].join("\n");
+
+      await flowDynamic(mensajeDetalle);
+
+      await flowDynamic(
+        [
+          "🔍 *Selecciona una acción:*",
+          "1. ✅ Aprobar",
+          "2. ❌ Rechazar",
+          "3. 🔍 Ver número",
+          "4. 🏠 Menú principal",
+        ].join("\n"),
+      );
+    },
+  )
+  // Captura inmediatamente la respuesta al menú (1, 2, 3 o 4)
+  .addAnswer(
+    "Elige una opción de acción:",
+    { capture: true },
+    async (ctx, { state, flowDynamic, gotoFlow, fallBack }) => {
       try {
-        const opcion = parseInt(ctx.body.trim().replace(/\D/g, ""));
+        const input = ctx.body.trim();
+        if (!/^\d+$/.test(input)) {
+          return fallBack("❌ Opción inválida. Elige un número del 1 al 4:");
+        }
+
+        const opcion = parseInt(input, 10);
         const stateData = await state.getMyState();
         const selectedRegistro = stateData?.selectedRegistro;
         const tablaAsignada = stateData?.tablaAsignada;
         const usuario = stateData?.usuario;
         const numeroSolicitante = stateData?.numeroSolicitante;
 
-        if (!selectedRegistro) {
-          await flowDynamic(
-            "❌ No hay un registro seleccionado. Por favor, comienza de nuevo.",
-          );
-          return gotoFlow(mainFlow);
+        if (!selectedRegistro?.nombre_solicitante) {
+          return fallBack("❌ No hay un registro seleccionado válido.");
         }
 
-        if (isNaN(opcion) || opcion < 1 || opcion > 4) {
-          await flowDynamic("❌ Opción inválida. Elige un número del 1 al 4.");
-          return;
+        if (opcion < 1 || opcion > 4) {
+          return fallBack("❌ Opción inválida. Elige un número del 1 al 4:");
         }
 
         switch (opcion) {
@@ -289,7 +294,6 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
               `📱 Número del solicitante:\n${numeroSolicitante}`,
             );
 
-            // Muestra el menú de acciones para seguir en la aprobacion/rechazo de la requisicion sin salir del flujo
             await flowDynamic(
               [
                 "🔍 *Selecciona una acción:*",
@@ -299,7 +303,7 @@ export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
                 "4. 🏠 Menú principal",
               ].join("\n"),
             );
-            return; // Mantiene la captura abierta esperando que elijas otra opcion
+            return;
           }
           case 4:
             return gotoFlow(mainFlow);
