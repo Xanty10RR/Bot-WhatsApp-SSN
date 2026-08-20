@@ -15,7 +15,7 @@ export const pool = new Pool({
 
 export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   .addAnswer(
-    "¡Vamos a crear una nueva requisición!.\nPor favor, dime tu *nombre completo*:",
+    "¡Vamos a crear una nueva requisición!.\nPor favor, dime tu *nombre completo:*",
     { capture: true },
     async (ctx, { state }) => {
       await state.update({ nombre: ctx.body });
@@ -51,19 +51,18 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
       const seleccion = ctx.body.trim();
       const departamento = mapaDept[seleccion];
 
-      // Si la opción no existe en nuestro mapa, ejecutamos fallBack
+      // Si la opcion no existe en el mapa, ejecutar un fallBack
       if (!departamento) {
         return fallBack(
           "❌ Opción no válida. Por favor responde con un número del 1 al 5.",
         );
       }
-
       await state.update({ departamento_destino: departamento });
       await flowDynamic(`Has seleccionado: *${departamento}*`);
     },
   )
   .addAnswer(
-    "⚠️ Si usted es *ASESOR* escriba el *código de punto de venta* o si usted es *administrativo* marque *000*:",
+    "⚠️ Si usted es *ASESOR* escriba el *código de punto de venta* o si usted es *ADMINISTRATIVO* marque *000*:",
     { capture: true },
     async (ctx, { flowDynamic, state }) => {
       const input = ctx.body.trim();
@@ -77,7 +76,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   )
   .addAnswer(
     [
-      "Marca de qué *tipo es tu solicitud*:",
+      "Marca de qué *tipo es tu solicitud:*",
       "1. 🛒 Compras",
       "2. 🛠️ Mantenimiento",
       "3. 🚕 Transporte",
@@ -87,7 +86,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     async (ctx, { flowDynamic, state, fallBack }) => {
       const opcion = parseInt(ctx.body.trim());
 
-      // Validamos si es un número válido entre 1 y 4
+      // Valida si es un número entre 1 y 4
       if (isNaN(opcion) || opcion < 1 || opcion > 4) {
         // fallBack() detiene el flujo y vuelve a hacer EXACTAMENTE la misma pregunta
         return fallBack(
@@ -95,7 +94,6 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
         );
       }
 
-      // Mapeamos el número a texto legible si lo deseas
       const tipos = ["Compras", "Mantenimiento", "Transporte", "Otros"];
       const tipoSeleccionado = tipos[opcion - 1];
 
@@ -128,14 +126,14 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     },
   )
   .addAnswer(
-    "Por favor escriba una *descripción detallada*:",
+    "Por favor escriba una *descripción detallada:*",
     { capture: true },
     async (ctx, { state }) => {
       await state.update({ descripcion: ctx.body });
     },
   )
   .addAnswer(
-    "Indique la *cantidad necesaria*:",
+    "Indique la *cantidad necesaria:*",
     { capture: true },
     async (ctx, { flowDynamic, state }) => {
       // Validamos que sea un número
@@ -147,7 +145,7 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     },
   )
   .addAnswer(
-    "Agregue alguna *observación adicional*:",
+    "Agregue alguna *observación adicional:*",
     { capture: true },
     async (ctx, { state }) => {
       await state.update({ observaciones: ctx.body });
@@ -157,7 +155,6 @@ export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     const datos = state.getMyState();
 
     try {
-      // Ahora es una sola inserción en una sola tabla
       await pool.query(
         `INSERT INTO requisiciones (
                 usuario_whatsapp, nombre_solicitante, cedula_solicitante, departamento, 
