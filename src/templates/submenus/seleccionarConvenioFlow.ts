@@ -9,7 +9,7 @@ import { mainFlow } from "../mainFlow";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
+export const seleccionarConvenioFlow: any = addKeyword(EVENTS.ACTION)
   .addAction(async (ctx, { state, flowDynamic }) => {
     const myState = state.getMyState();
     
