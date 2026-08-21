@@ -1,7 +1,7 @@
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
 
-export const submenu3Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION3)
+export const submenu3Flow: any = addKeyword(MENU_IDS.PRINCIPAL.OPCION3)
     .addAnswer("", { capture: false })
     .addAction(async (ctx, { provider }) => {
         const list = {
