@@ -1017,14 +1017,18 @@ var templates = createFlow([
     mainFlow
 ]);
 
-const main = async () => {
-    const { httpServer } = await createBot({
+let botPromise;
+const getBot = () => {
+    botPromise ??= createBot({
         flow: templates,
         provider: provider,
         database: new MemoryDB(),
     });
-    const port = Number(config.PORT || 3001);
-    httpServer(port);
-    console.log(`✅ Bot corriendo en http://localhost:${port}`);
+    return botPromise;
 };
-main().catch(console.error);
+async function handler(req, res) {
+    const { httpServer } = await getBot();
+    return httpServer(req, res);
+}
+
+export { handler as default };

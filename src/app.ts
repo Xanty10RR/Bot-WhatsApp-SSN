@@ -5,17 +5,19 @@ import { config } from './config';
 import templates from './templates';
 import './provider/database';
 
-const main = async () => {
-    const { httpServer } = await createBot({
+let botPromise: ReturnType<typeof createBot> | undefined;
+
+const getBot = () => {
+    botPromise ??= createBot({
         flow: templates,
         provider: provider,
         database: new MemoryDB(),
     });
-
-    const port = Number(config.PORT || 3001);
-    httpServer(port); // levanta el servidor interno de Builderbot
-
-    console.log(`✅ Bot corriendo en http://localhost:${port}`);
+    return botPromise;
 };
 
-main().catch(console.error);
+export default async function handler(req: any, res: any) {
+    const { httpServer } = await getBot();
+
+    return (httpServer as unknown as (request: any, response: any) => unknown)(req, res);
+}
