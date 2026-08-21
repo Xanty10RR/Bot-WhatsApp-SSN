@@ -12,7 +12,7 @@ import { mainFlow } from "../mainFlow";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const submenu1Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
+export const submenu1Flow: any = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
   .addAnswer(
     "✍️ Escribe el NIT, nombre, empresa o sigla del convenio que deseas consultar.",
     { capture: true },
