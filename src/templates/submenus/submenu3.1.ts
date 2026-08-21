@@ -13,7 +13,7 @@ export const pool = new Pool({
   port: dbPort,
 });
 
-export const RequisicionSolicitud = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
+export const RequisicionSolicitud: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   .addAnswer(
     "¡Vamos a crear una nueva requisición!.\nPor favor, dime tu *nombre completo* (_solo texto_):",
     { capture: true },
