@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "target": "ES2022",
     "module": "ES2022",
+    "moduleResolution": "bundler",
     "noImplicitAny": true,
     "declaration": false,
     "declarationMap": false,
-    "moduleResolution": "node",
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -14,6 +13,7 @@
     "sourceMap": false,
     "outDir": "./dist",
     "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
     "rootDir": "./",
     "incremental": true,
     "skipLibCheck": true,
@@ -22,15 +22,12 @@
     }
   },
   "include": [
-    "**/*.js",
-    "**/*.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.spec.ts",
-    "**e2e**",
-    "**mock**"
+    "**/*.spec.ts"
   ]
 }
