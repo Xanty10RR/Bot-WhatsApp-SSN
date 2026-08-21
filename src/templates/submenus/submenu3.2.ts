@@ -13,7 +13,7 @@ export const pool = new Pool({
   port: Number(process.env.DB_PORT) || 5432,
 });
 
-export const VerificarIdentidad = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
+export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
   .addAnswer(
     [
       "🔐 *¿Usuario real?*\nIngresa tu usuario y contraseña separados por una coma.",
