@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ES2022",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "noImplicitAny": true,
     "declaration": false,
     "declarationMap": false,
@@ -13,7 +13,6 @@
     "sourceMap": false,
     "outDir": "./dist",
     "baseUrl": "./",
-    "ignoreDeprecations": "6.0",
     "rootDir": "./",
     "incremental": true,
     "skipLibCheck": true,
