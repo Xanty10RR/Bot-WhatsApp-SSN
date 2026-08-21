@@ -2,7 +2,7 @@
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
 
-export const submenu2Flow = addKeyword(MENU_IDS.PRINCIPAL.OPCION2)
+export const submenu2Flow: any = addKeyword(MENU_IDS.PRINCIPAL.OPCION2)
     .addAnswer("Se te revelo el sistema?")
     .addAnswer("¿Qué tipo de ayuda quieres?",
         {
