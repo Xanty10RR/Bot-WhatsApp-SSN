@@ -7,7 +7,6 @@ export default function handler(
     console.log("🔥 WEBHOOK:", req.method);
     console.log("QUERY:", req.query);
 
-    // Verificación de Meta
     if (req.method === "GET") {
         const mode = req.query["hub.mode"];
         const token = req.query["hub.verify_token"];
@@ -31,7 +30,6 @@ export default function handler(
         return res.status(403).send("Token incorrecto o parámetros inválidos");
     }
 
-    // Aquí posteriormente recibiremos los mensajes de WhatsApp
     if (req.method === "POST") {
         console.log("📩 WEBHOOK POST:", req.body);
 
