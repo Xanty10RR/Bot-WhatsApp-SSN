@@ -8,7 +8,9 @@ export default function handler(
 
     return res.status(200).json({
         ok: true,
-        message: "Webhook de Vercel funcionando",
+        source: "api/webhook.ts",
+        message: "ESTE ES EL WEBHOOK DE VERCEL",
         method: req.method,
+        query: req.query,
     });
 }
