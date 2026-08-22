@@ -1,23 +1,20 @@
-import { createBot } from '@builderbot/bot';
-import { MemoryDB } from '@builderbot/bot';
+import { createBot, MemoryDB } from '@builderbot/bot';
 import { provider } from './provider';
 import { config } from './config';
 import templates from './templates';
 import './provider/database';
 
-let botPromise: ReturnType<typeof createBot> | undefined;
-
-const getBot = () => {
-    botPromise ??= createBot({
+const main = async () => {
+    const { httpServer } = await createBot({
         flow: templates,
         provider: provider,
         database: new MemoryDB(),
     });
-    return botPromise;
+
+    const port = Number(config.PORT || 3001);
+    httpServer(port); // levanta el servidor interno de Builderbot
+
+    console.log(`✅ Bot corriendo en http://localhost:${port}`);
 };
 
-export default async function handler(req: any, res: any) {
-    const { httpServer } = await getBot();
-
-    return (httpServer as unknown as (request: any, response: any) => unknown)(req, res);
-}
+main().catch(console.error);
