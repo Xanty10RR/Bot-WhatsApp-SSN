@@ -81,7 +81,7 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
         if (coincidencias.length === 1) {
           const convenio = coincidencias[0];
           await flowDynamic(formatearConvenio(convenio));
-          const rutaImagen = resolve(__dirname, "images", `${convenio.codigo_convenio}.webp`);
+          const rutaImagen = resolve(__dirname, "images", `${convenio.codigo_convenio}.png`);
           if (existsSync(rutaImagen)) {
             await flowDynamic([{ body: "📷 *Instructivo para realizar el recaudo.*", media: rutaImagen }]);
           }
