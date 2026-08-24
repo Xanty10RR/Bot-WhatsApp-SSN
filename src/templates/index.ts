@@ -10,10 +10,9 @@ import { submenu1Flow } from "./submenus/submenu1";
 import { submenu2Flow } from "./submenus/submenu2";
 import { submenu3Flow } from "./submenus/submenu3";
 
-// Importa sub-submenús
+// Importa sub-submenús, se pueden agregar más sub-submenús aquí
 import { RequisicionSolicitud } from "./submenus/submenu3.1";
 import { VerificarIdentidad } from "./submenus/submenu3.2";
-// Puedes agregar más sub-submenús aquí
 
 export default createFlow([
     // Primero los más específicos (sub-submenús)
