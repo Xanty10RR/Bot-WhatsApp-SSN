@@ -1,6 +1,6 @@
+import 'dotenv/config';
 import { createProvider, addKeyword, EVENTS, createFlow, createBot, MemoryDB } from '@builderbot/bot';
 import { MetaProvider } from '@builderbot/provider-meta';
-import 'dotenv/config';
 import { existsSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
@@ -174,9 +174,6 @@ const pool$2 = new Pool({
         rejectUnauthorized: false,
     },
 });
-pool$2.query('SELECT NOW()')
-    .then(() => console.log('✅ Conectado a PostgreSQL'))
-    .catch(err => console.error('❌ Error de conexión a PostgreSQL:', err));
 
 class ConvenioService {
     static async buscar(texto) {
@@ -534,10 +531,10 @@ const seleccionarConvenioFlow = addKeyword(EVENTS.ACTION)
     const listaCompleta = myState.listaConveniosOriginal || coincidenciasActivas;
     const convenio = listaCompleta[numero - 1];
     if (!convenio) {
-        return fallBack("❌ El número seleccionado no está en el rango de la lista.");
+        return fallBack("❌ El número seleccionado no está en el rango de la lista. Por favor, escribe un *número válido que se encuentre dentro de la lista* para continuar.");
     }
     await flowDynamic(formatearConvenio(convenio));
-    const rutaImagen = resolve(__dirname, "images", `${convenio.codigo_convenio}.png`);
+    const rutaImagen = resolve(__dirname, "images", `${convenio.codigo_convenio}.webp`);
     if (existsSync(rutaImagen)) {
         await flowDynamic([{ body: "📷 *Instructivo para realizar el recaudo.*", media: rutaImagen }]);
     }
@@ -1021,14 +1018,16 @@ let botPromise;
 const getBot = () => {
     botPromise ??= createBot({
         flow: templates,
-        provider: provider,
+        provider,
         database: new MemoryDB(),
     });
     return botPromise;
 };
-async function handler(req, res) {
-    const { httpServer } = await getBot();
-    return httpServer(req, res);
-}
 
-export { handler as default };
+const main = async () => {
+    const { httpServer } = await getBot();
+    const port = Number(config.PORT || 3001);
+    httpServer(port);
+    console.log(`✅ Bot corriendo en http://localhost:${port}`);
+};
+main().catch(console.error);
