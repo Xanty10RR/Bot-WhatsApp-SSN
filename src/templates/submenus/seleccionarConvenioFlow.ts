@@ -79,7 +79,7 @@ export const seleccionarConvenioFlow: any = addKeyword(EVENTS.ACTION)
       const convenio = listaCompleta[numero - 1];
 
       if (!convenio) {
-        return fallBack("❌ El número seleccionado no está en el rango de la lista.");
+        return fallBack("❌ El número seleccionado no está en el rango de la lista. Por favor, escribe un *número válido que se encuentre dentro de la lista* para continuar.");
       }
 
       await flowDynamic(formatearConvenio(convenio));
