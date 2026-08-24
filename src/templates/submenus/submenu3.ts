@@ -22,7 +22,7 @@ export const submenu3Flow: any = addKeyword(MENU_IDS.PRINCIPAL.OPCION3)
                         title: "Requisiciones",
                         rows: [
                             {
-                                id: MENU_IDS.SUBMENU_3.OPCION1, // Asegúrate que existe
+                                id: MENU_IDS.SUBMENU_3.OPCION1,
                                 title: "Solicitar requisición",
                                 description: "Crear nueva solicitud"
                             },
