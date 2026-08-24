@@ -198,7 +198,6 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
         numeroSolicitante: segundoValor,
       });
 
-      // Datos de equisicion formateada
       const mensajeDetalle = [
         "📄 *Detalles del registro seleccionado:*",
         "",
@@ -229,7 +228,7 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
       );
     },
   )
-  // Paso 3: Captura inmediatamente la respuesta al menú de acciones (1, 2, 3 o 4)
+  // Captura inmediatamente la respuesta al menú de acciones (1, 2, 3 o 4)
   .addAnswer(
     "Elige una opción de acción:",
     { capture: true },
