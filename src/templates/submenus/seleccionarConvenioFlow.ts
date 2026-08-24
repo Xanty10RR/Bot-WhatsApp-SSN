@@ -85,7 +85,7 @@ export const seleccionarConvenioFlow: any = addKeyword(EVENTS.ACTION)
 
       await flowDynamic(formatearConvenio(convenio));
 
-      const rutaImagen = resolve(__dirname, "images", `${convenio.codigo_convenio}.webp`);
+      const rutaImagen = resolve(__dirname, "images", `${convenio.codigo_convenio}.png`);
       if (existsSync(rutaImagen)) {
         await flowDynamic([{ body: "📷 *Instructivo para realizar el recaudo.*", media: rutaImagen }]);
       }
