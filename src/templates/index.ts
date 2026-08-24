@@ -1,5 +1,3 @@
-// templates/index.ts
-
 import { createFlow } from "@builderbot/bot";
 
 // Importa el flujo principal
@@ -18,17 +16,17 @@ import { VerificarIdentidad } from "./submenus/submenu3.2";
 // Puedes agregar más sub-submenús aquí
 
 export default createFlow([
-    // 1. Primero los más específicos (sub-submenús)
+    // Primero los más específicos (sub-submenús)
     RequisicionSolicitud,
     VerificarIdentidad,
 
-    // 2. Luego los submenús
-    seleccionarConvenioFlow, // Añadido
-    sugerenciaFlow,         // Añadido
+    // Luego los submenús
+    seleccionarConvenioFlow,
+    sugerenciaFlow,
     submenu1Flow,
     submenu2Flow,
     submenu3Flow,
 
-    // 3. Al final el flujo principal
+    // Final del flujo principal
     mainFlow
 ]);
