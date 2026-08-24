@@ -39,7 +39,8 @@ export const seleccionarConvenioFlow: any = addKeyword(EVENTS.ACTION)
     // Actualizamos el estado guardando la lista original intacta y la página
     await state.update({ 
       listaConveniosOriginal: listaCompleta,
-      listaConvenios: sliceConvenios, // Los que están activos para seleccionar en esta página
+      // Los que están activos para seleccionar en esta página
+      listaConvenios: sliceConvenios,
       paginaConvenios: pagina 
     });
 
