@@ -19,9 +19,9 @@ COPY . .
 
 RUN npm run build
 
-# Copiar imágenes WebP al directorio del flow compilado
-RUN mkdir -p dist/templates/submenus/images \
-    && cp -r src/templates/submenus/images/. dist/templates/submenus/images/
+# Copiar imágenes WebP junto al app.js compilado
+RUN mkdir -p dist/images \
+    && cp -r src/templates/submenus/images/. dist/images/
 
 RUN apk del .gyp
 
