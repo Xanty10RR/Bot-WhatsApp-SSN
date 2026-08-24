@@ -50,7 +50,7 @@ export const submenu1Flow: any = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
         const rutaImagen = resolve(
           __dirname,
           "images",
-          `${convenio.codigo_convenio}.webp`,
+          `${convenio.codigo_convenio}.png`,
         );
         if (existsSync(rutaImagen)) {
           await flowDynamic([
