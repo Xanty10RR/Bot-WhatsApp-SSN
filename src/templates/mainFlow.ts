@@ -9,10 +9,10 @@ const mainFlow = addKeyword(['inicio', 'menu', EVENTS.WELCOME])
         const list = {
             header: { 
                 type: "text", 
-                text: "Soy el Asistente de SuperGiros"
+                text: "¡Hola!, 👋 soy el Asistente de SuperGiros"
             },
             body: { 
-                text: "¡Hola! 👋 Estoy aquí las 24h para brindarte una mejor experiencia y ayudarte a consultar *información sobre recaudos de convenios*, *solicitar* y *aprobar requisiciones* de forma rápida.\n¿Qué deseas hacer hoy?, selecciona una opción" 
+                text: "Estoy aquí las 24h para brindarte una mejor experiencia y ayudarte a consultar *información sobre recaudos de convenios*, *solicitar* y *aprobar requisiciones* de forma rápida.\n¿Qué deseas hacer hoy?, selecciona una opción" 
             },
             footer: { 
                 text: "SUPERSERVICIOS DE NARIÑO S.A" 
