@@ -1,6 +1,6 @@
 ---
 
-## 🤖 WhatsApp Cloud API & BuilderBot Assistant
+## WhatsApp Cloud API & BuilderBot Assistant
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
