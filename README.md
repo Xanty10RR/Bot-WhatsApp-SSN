@@ -43,13 +43,10 @@ Designed with modern backend technologies, it features custom triggers and an Ex
 3. **Configure environment variables:**
    Create a .env file in the root directory and add your Meta Cloud API credentials and port configuration:
    PORT=3000
-   
    META_TOKEN=your_token_aqui
-   
    PHONE_NUMBER_ID=your_phone_number_id
-   
    VERIFY_TOKEN=your_verify_token
-
+   
 5. **Run the development server:**
    ```bash
    npm run dev
