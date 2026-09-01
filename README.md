@@ -41,31 +41,31 @@ Designed with modern backend technologies, it features custom triggers and an Ex
    ```
 
 3. **Configure environment variables:**
-4. ```
    Create a .env file in the root directory and add your Meta Cloud API credentials and port configuration:
-   bash
    PORT=3000
+   
    META_TOKEN=your_token_aqui
+   
    PHONE_NUMBER_ID=your_phone_number_id
+   
    VERIFY_TOKEN=your_verify_token
-   ```
 
 5. **Run the development server:**
    ```bash
    npm run dev
    ```
 
-## Documentation
+## 📚 Documentation
 
 - This project uses and adapts information from the [official BuilderBot documentation](https://builderbot.vercel.app/), consult to learn how to use all the features and characteristics of the library.
 - Integrated with [Meta Graph API Documentation](https://developers.facebook.com/documentation/business-messaging/whatsapp/about-the-platform) for webhook and messaging management.
 
-## Live Demo
+## 📱 Live Demo
 
-Puedes probar el bot en funcionamiento haciendo clic en el siguiente [enlace directo](https://wa.me/573181057643?text=Hola%2C%20este%20es%20un%20mensaje%20de%20prueba)
+Puedes probar el bot en funcionamiento haciendo clic en el siguiente [enlace directo](https://wa.me/573181057643?text=Hola%2C%20este%20es%20un%20mensaje%20de%20prueba):
 
 
-## Contact me
+## 👤 Contact me
 
 - 💻 [![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-santiago-rosero-4420a91b0/)
 
