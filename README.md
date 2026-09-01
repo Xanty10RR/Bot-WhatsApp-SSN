@@ -7,20 +7,20 @@
 [![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)](https://expressjs.com/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-## 📖 Description
+## Description
 
 An automated WhatsApp chat flow solution built from scratch using **BuilderBot** and the official **Meta Cloud API**. This project handles incoming and outgoing message routing via webhooks, interacts dynamically with users through structured conversational menus, and runs seamlessly in production environments. 
 
 Designed with modern backend technologies, it features custom triggers and an Express server optimized for cloud deployment and scalability.
 
-## 🚀 Key Features
+## Key Features
 
 - **Meta Cloud API Integration**: Direct webhook handling and messaging using Meta's official graph API endpoints.
 - **Conversational Flows**: Automated interactive menus and dynamic responses powered by BuilderBot.
 - **Cloud Ready**: Configured for continuous deployment on cloud platforms like Render via custom HTTP port binding and environment variables.
 - **Robust Tech Stack**: Developed with TypeScript and Express.js to ensure type safety and scalable routing.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Core**: Node.js, TypeScript, JavaScript
 - **Frameworks**: BuilderBot, Express.js
@@ -52,12 +52,12 @@ Designed with modern backend technologies, it features custom triggers and an Ex
    npm run dev
    ```
 
-## 📚 Documentation
+## Documentation
 
 - This project uses and adapts information from the [official BuilderBot documentation](https://builderbot.vercel.app/), consult to learn how to use all the features and characteristics of the library.
 - Integrated with [Meta Graph API Documentation](https://developers.facebook.com/documentation/business-messaging/whatsapp/about-the-platform) for webhook and messaging management.
 
-## 📱 Live Demo
+## Live Demo
 
 Puedes probar el bot en funcionamiento haciendo clic en el siguiente [enlace directo](https://wa.me/573181057643?text=Hola%2C%20este%20es%20un%20mensaje%20de%20prueba):
 
