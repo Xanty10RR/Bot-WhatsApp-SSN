@@ -1,5 +1,7 @@
 ---
 
+---
+
 ## 🤖 WhatsApp Cloud API & BuilderBot Assistant
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -30,26 +32,25 @@ Designed with modern backend technologies, it features custom triggers and an Ex
 ## ⚙️ Quick Installation & Setup
 
 1. **Clone the repository:**
-   ```
-   bash
-   git clone [https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git](https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git)
+   ```bash
+   git clone https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git
    cd-ts-meta-memory
    ```
+
 2. **Install dependencies:**
-   ```
-   bash
+   ```bash
    npm install
    ```
+
 3. **Configure environment variables:**
    Create a .env file in the root directory and add your Meta Cloud API credentials and port configuration:
-
    PORT=3000
    META_TOKEN=your_token_aqui
    PHONE_NUMBER_ID=your_phone_number_id
    VERIFY_TOKEN=your_verify_token
+
 4. **Run the development server:**
-   ```
-   bash
+   ```bash
    npm run dev
    ```
 
@@ -65,8 +66,10 @@ Puedes probar el bot en funcionamiento haciendo clic en el siguiente [enlace dir
 
 ## Contact me
 
-- 👨🏻‍💻[![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-santiago-rosero-4420a91b0/)
+- 👨🏻💻 [![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-santiago-rosero-4420a91b0/)
 
 - 📧 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:santiagocajamarca.37@gmail.com)
+
+---
 
 ---
