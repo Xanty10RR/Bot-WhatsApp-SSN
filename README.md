@@ -31,10 +31,8 @@ Designed with modern backend technologies, it features custom triggers and an Ex
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git]
-   (https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git)
-   cd base-ts-meta-memory
-   ```
+   git clone [https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git](https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git)
+   cd-ts-meta-memory
 2. **Install dependencies:**
    ```bash
    npm install
