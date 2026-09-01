@@ -41,8 +41,8 @@ Designed with modern backend technologies, it features custom triggers and an Ex
    ```
 
 3. **Configure environment variables:**
+4. ```
    Create a .env file in the root directory and add your Meta Cloud API credentials and port configuration:
-   ```
    bash
    PORT=3000
    META_TOKEN=your_token_aqui
