@@ -33,11 +33,11 @@ Designed with modern backend technologies, it features custom triggers and an Ex
    ```bash
    git clone [https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git](https://github.com/Xanty10RR/Bot-WhatsApp-SSN.git)
    cd-ts-meta-memory
-   `
+   ` ``` `
 2. **Install dependencies:**
    ```bash
    npm install
-   `
+   ` ``` `
 3. **Configure environment variables:**
    Create a .env file in the root directory and add your Meta Cloud API credentials and port configuration:
    PORT=3000
@@ -47,7 +47,7 @@ Designed with modern backend technologies, it features custom triggers and an Ex
 4. **Run the development server:**
    ```bash
    npm run dev
-   `
+   ` ``` `
 
 ## Documentation
 
