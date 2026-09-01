@@ -50,18 +50,18 @@ Designed with modern backend technologies, it features custom triggers and an Ex
    npm run dev
    ```
 
-## Documentation
+## 📚 Documentation
 
 - This project uses and adapts information from the [official BuilderBot documentation](https://builderbot.vercel.app/), consult to learn how to use all the features and characteristics of the library.
 - Integrated with [Meta Graph API Documentation](https://developers.facebook.com/documentation/business-messaging/whatsapp/about-the-platform) for webhook and messaging management.
 
-## Live Demo
+## 📱 Live Demo
 
 Puedes probar el bot en funcionamiento haciendo clic en el siguiente [enlace directo](https://wa.me/573181057643?text=Hola%2C%20este%20es%20un%20mensaje%20de%20prueba):
 
 
-## Contact me
+## 👤 Contact me
 
-- 👨🏻💻 [![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-santiago-rosero-4420a91b0/)
+- 💻 [![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-santiago-rosero-4420a91b0/)
 
 - 📧 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:santiagocajamarca.37@gmail.com)
