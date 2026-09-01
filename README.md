@@ -53,11 +53,12 @@ Designed with modern backend technologies, it features custom triggers and an Ex
 - Integrated with [Meta Graph API Documentation](https://developers.facebook.com/documentation/business-messaging/whatsapp/about-the-platform) for webhook and messaging management.
 
 ## Live Demo
+
 Puedes probar el bot en funcionamiento haciendo clic en el siguiente [enlace directo](https://wa.me/573181057643?text=Hola%2C%20este%20es%20un%20mensaje%20de%20prueba):
 
 
 ## Contact me
-- https://santiagorc-portfolio.vercel.app/
+
 - 👨🏻‍💻[![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-santiago-rosero-4420a91b0/)
 
 - 📧 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:santiagocajamarca.37@gmail.com)
