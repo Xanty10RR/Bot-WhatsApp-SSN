@@ -2,20 +2,20 @@ import { addKeyword, EVENTS } from "@builderbot/bot";
 import { MENU_IDS } from "./constants";
 import { createClient } from "@supabase/supabase-js";
 
-// 1. Inicializar Supabase usando tus variables de entorno del archivo .env raíz
+// Inicializar Supabase usando el archivo .env
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!,
+  process.env.SUPABASE_ANON_KEY!,
 );
 
-// 2. Función para registrar o actualizar la sesión y el conteo de mensajes del usuario
+// Función que registra o actualiza la sesión y el conteo de mensajes del usuario
 const registrarInteraccionBot = async (
   telefono: string,
   nombre: string,
   accion: string,
 ) => {
   try {
-    // Consultamos si el usuario ya existe para incrementar su total de mensajes
+    // Consultar si el usuario ya existe para incrementar su total de mensajes
     const { data: existingUser } = await supabase
       .from("sesiones_chat")
       .select("total_mensajes")
@@ -43,7 +43,7 @@ const registrarInteraccionBot = async (
 const mainFlow = addKeyword(["inicio", "menu", EVENTS.WELCOME])
   .addAnswer("")
   .addAction(async (ctx, { provider }) => {
-    // 🚀 3. Registramos la sesión en Supabase en el preciso instante en que escribe
+    // Registro la sesión en Supabase apenas el usuario escribe
     const telefono = ctx.from;
     const nombre = ctx.pushName || "Usuario WhatsApp";
     await registrarInteraccionBot(
