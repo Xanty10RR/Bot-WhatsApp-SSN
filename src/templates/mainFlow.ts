@@ -8,7 +8,7 @@ const supabase = createClient(
     process.env.SUPABASE_ANON_KEY!
 );
 
-// 2. Función para registrar en Supabase con logs en consola
+// Función para registrar en Supabase con logs en consola
 const registrarInteraccionBot = async (telefono: string, nombre: string, accion: string) => {
     try {
         console.log(`[DEBUG] Intentando registrar sesión para el número: ${telefono}`);
@@ -32,7 +32,19 @@ const registrarInteraccionBot = async (telefono: string, nombre: string, accion:
         if (error) {
             console.error("❌ SUPABASE RECHAZÓ EL REGISTRO:", error.message);
         } else {
-            console.log("✅ ¡Sesión guardada/actualizada con éxito en Supabase!");
+            console.log("✅ ¡Sesión guardada/actualizada con éxito en tabla sesiones_chat!");
+        }
+        // Inserta una nueva fila en tabla total_historico_usuarios (para contador acumulativo de usuarios nuevos o recurrentes)
+        const { error: errorHistorico } = await supabase.from('total_historico_usuarios').insert({
+            telefono: telefono,
+            nombre: nombre || 'Usuario WhatsApp',
+            fecha: new Date()
+        });
+
+        if (errorHistorico) {
+            console.error("❌ SUPABASE RECHAZÓ EL REGISTRO EN total_historico_usuarios:", errorHistorico.message);
+        } else {
+            console.log("✅ ¡Registrado en total_historico_usuarios (+1)!");
         }
     } catch (err) {
         console.error("❌ ERROR CRÍTICO EN LA FUNCIÓN:", err);
@@ -42,7 +54,7 @@ const registrarInteraccionBot = async (telefono: string, nombre: string, accion:
 const mainFlow = addKeyword(['hola', 'Hola', 'inicio', 'Menu', 'menu', EVENTS.WELCOME])
     .addAction(async (ctx, { provider }) => {
         
-        // 🚀 3. Este log debe aparecer en tu terminal apenas escribas en WhatsApp
+        // Este log debe aparecer en tu terminal apenas escribas en WhatsApp
         console.log("🔥 ¡Mensaje recibido de:", ctx.from);
 
         // Llamamos a la función de registro
