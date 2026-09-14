@@ -1,5 +1,6 @@
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
+import { registrarErrorApi } from "../../utils/registroFallosApi";
 
 export const submenu3Flow: any = addKeyword(MENU_IDS.PRINCIPAL.OPCION3)
     .addAnswer("", { capture: false })
@@ -41,6 +42,7 @@ export const submenu3Flow: any = addKeyword(MENU_IDS.PRINCIPAL.OPCION3)
             await provider.sendList(ctx.from, list);
         } catch (error) {
             console.error("Error al enviar lista:", error);
+            await registrarErrorApi(error, 'submenu3', ctx.from);
             // Fallback a mensajes simples si falla la lista
             await provider.sendText(ctx.from, "Por favor elige una opción:");
             await provider.sendText(ctx.from, "1. Solicitar requisición");
