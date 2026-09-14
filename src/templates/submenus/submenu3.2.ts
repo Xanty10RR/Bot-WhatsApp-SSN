@@ -3,6 +3,7 @@ import { MENU_IDS } from "../constants";
 import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import { mainFlow } from "../mainFlow";
+import { registrarErrorApi } from '../../utils/registroFallosApi';
 
 // Configuración de PostgreSQL
 export const pool = new Pool({
@@ -146,6 +147,7 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
         );
       } catch (error) {
         console.error("Error al verificar identidad:", error);
+        await registrarErrorApi(error, 'submenu3.2', ctx.from);
         await flowDynamic("❌ Ocurrió un error al procesar tu solicitud.");
         await flowDynamic([
           {
@@ -318,6 +320,7 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
         }
       } catch (error) {
         console.error("Error en acción:", error);
+        await registrarErrorApi(error, 'submenu3.2', ctx.from);
         await flowDynamic(
           "❌ Ocurrió un error al procesar en la base de datos.",
         );
