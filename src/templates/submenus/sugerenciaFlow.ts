@@ -7,6 +7,7 @@ import { existsSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { mainFlow } from "../mainFlow";
+import { registrarErrorApi } from "../../utils/registroFallosApi";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -50,6 +51,7 @@ const mostrarMenuBotones = async (ctx: any, texto: string, botones: any[]) => {
     });
   } catch (error) {
     console.error("❌ Error enviando botones:", error);
+    await registrarErrorApi(error, 'sugerenciaFlow', ctx.from);
   }
 };
 
