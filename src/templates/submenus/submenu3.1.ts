@@ -1,6 +1,7 @@
 import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
 import { Pool } from "pg";
+import { registrarErrorApi } from "../../utils/registroFallosApi";
 
 // Configuración de PostgreSQL
 const dbPort = Number(process.env.DB_PORT ?? "5432");
@@ -196,6 +197,7 @@ export const RequisicionSolicitud: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
       );
     } catch (error) {
       console.error("Error al guardar:", error);
+      await registrarErrorApi(error, 'submenu3.1', ctx.from);
       await flowDynamic("❌ Error al guardar la requisición.");
     }
     await flowDynamic([
