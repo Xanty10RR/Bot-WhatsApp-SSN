@@ -66,7 +66,7 @@ const registrarInteraccionBot = async (
     }
   } catch (err) {
     console.error("❌ ERROR CRÍTICO EN LA FUNCIÓN:", err);
-    // 👇 Cambiamos 'error' por 'err' y 'ctx.from' por 'telefono'
+    // Cambiamos 'ctx.from' por 'telefono'
     await registrarErrorApi(err, "mainFlow", telefono);
   }
 };
