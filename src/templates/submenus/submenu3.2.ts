@@ -3,7 +3,7 @@ import { MENU_IDS } from "../constants";
 import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import { mainFlow } from "../mainFlow";
-import { registrarErrorApi } from '../../utils/registroFallosApi';
+import { registrarErrorApi } from "../../utils/registroFallosApi";
 
 // Configuración de PostgreSQL
 export const pool = new Pool({
@@ -88,10 +88,7 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           await flowDynamic([
             {
               body: "¿Qué deseas hacer ahora?",
-              buttons: [
-                { body: "🔁 Otro intento" },
-                { body: "🏠 Menú" },
-              ],
+              buttons: [{ body: "🔁 Otro intento" }, { body: "🏠 Menú" }],
             },
           ]);
           return;
@@ -147,7 +144,7 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
         );
       } catch (error) {
         console.error("Error al verificar identidad:", error);
-        await registrarErrorApi(error, 'submenu3.2', ctx.from);
+        await registrarErrorApi(error, "submenu3.2", ctx.from);
         await flowDynamic("❌ Ocurrió un error al procesar tu solicitud.");
         await flowDynamic([
           {
@@ -259,18 +256,32 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
         switch (opcion) {
           case 1: {
             const idRegistro = selectedRegistro.id;
+
+            // 1. Intentamos borrar primero de la tabla de origen de forma atómica
+            const deleteResult = await pool.query(
+              `DELETE FROM ${tablaAsignada} WHERE id = $1 RETURNING *`,
+              [idRegistro],
+            );
+
+            // Si rowCount es 0, el dashboard u otro proceso ya la procesó/eliminó
+            if (deleteResult.rowCount === 0) {
+              await flowDynamic(
+                "⚠️ Esta requisición ya había sido procesada previamente desde el sistema.",
+              );
+              return gotoFlow(mainFlow);
+            }
+
+            // 2. Si se borró con éxito, la insertamos asegurando que sea única
             await pool.query(
               `INSERT INTO registro_aprobaciones (datos_completos, estado, aprobador, tabla_origen, fecha_decision) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
               [
-                JSON.stringify(selectedRegistro),
+                JSON.stringify(deleteResult.rows[0]), // Usamos los datos frescos de la BD
                 "aprobado",
                 usuario,
                 tablaAsignada,
               ],
             );
-            await pool.query(`DELETE FROM ${tablaAsignada} WHERE id = $1`, [
-              idRegistro,
-            ]);
+
             await flowDynamic(
               "🟢 Solicitud aprobada y guardada en base de datos.",
             );
@@ -278,18 +289,31 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           }
           case 2: {
             const idRegistro = selectedRegistro.id;
+
+            // 1. Intentamos borrar primero de la tabla de origen
+            const deleteResult = await pool.query(
+              `DELETE FROM ${tablaAsignada} WHERE id = $1 RETURNING *`,
+              [idRegistro],
+            );
+
+            if (deleteResult.rowCount === 0) {
+              await flowDynamic(
+                "⚠️ Esta requisición ya había sido procesada previamente desde el sistema.",
+              );
+              return gotoFlow(mainFlow);
+            }
+
+            // 2. Si se borró con éxito, registramos el rechazo
             await pool.query(
               `INSERT INTO registro_aprobaciones (datos_completos, estado, aprobador, tabla_origen, fecha_decision) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
               [
-                JSON.stringify(selectedRegistro),
+                JSON.stringify(deleteResult.rows[0]),
                 "rechazado",
                 usuario,
                 tablaAsignada,
               ],
             );
-            await pool.query(`DELETE FROM ${tablaAsignada} WHERE id = $1`, [
-              idRegistro,
-            ]);
+
             await flowDynamic(
               "🔴 Solicitud rechazada y guardada en base de datos.",
             );
@@ -320,7 +344,7 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
         }
       } catch (error) {
         console.error("Error en acción:", error);
-        await registrarErrorApi(error, 'submenu3.2', ctx.from);
+        await registrarErrorApi(error, "submenu3.2", ctx.from);
         await flowDynamic(
           "❌ Ocurrió un error al procesar en la base de datos.",
         );
