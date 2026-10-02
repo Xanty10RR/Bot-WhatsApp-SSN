@@ -257,13 +257,11 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           case 1: {
             const idRegistro = selectedRegistro.id;
 
-            // 1. Intentamos borrar primero de la tabla de origen de forma atómica
             const deleteResult = await pool.query(
               `DELETE FROM ${tablaAsignada} WHERE id = $1 RETURNING *`,
               [idRegistro],
             );
 
-            // Si rowCount es 0, el dashboard u otro proceso ya la procesó/eliminó
             if (deleteResult.rowCount === 0) {
               await flowDynamic(
                 "⚠️ Esta requisición ya había sido procesada previamente desde el sistema.",
@@ -271,16 +269,26 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
               return gotoFlow(mainFlow);
             }
 
-            // 2. Si se borró con éxito, la insertamos asegurando que sea única
-            await pool.query(
-              `INSERT INTO registro_aprobaciones (datos_completos, estado, aprobador, tabla_origen, fecha_decision) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
-              [
-                JSON.stringify(deleteResult.rows[0]), // Usamos los datos frescos de la BD
-                "aprobado",
-                usuario,
-                tablaAsignada,
-              ],
-            );
+            try {
+              await pool.query(
+                `INSERT INTO registro_aprobaciones (datos_completos, estado, aprobador, tabla_origen, fecha_decision) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
+                [
+                  JSON.stringify(deleteResult.rows[0]),
+                  "aprobado",
+                  usuario,
+                  tablaAsignada,
+                ],
+              );
+            } catch (dbError: any) {
+              // Si ocurre un error de duplicado (código 23505 de Postgres)
+              if (dbError.code === "23505") {
+                await flowDynamic(
+                  "⚠️ Esta requisición ya fue registrada y aprobada por otro medio.",
+                );
+                return gotoFlow(mainFlow);
+              }
+              throw dbError; // Si es otro error, que lo atrape el catch general
+            }
 
             await flowDynamic(
               "🟢 Solicitud aprobada y guardada en base de datos.",
@@ -290,7 +298,6 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           case 2: {
             const idRegistro = selectedRegistro.id;
 
-            // 1. Intentamos borrar primero de la tabla de origen
             const deleteResult = await pool.query(
               `DELETE FROM ${tablaAsignada} WHERE id = $1 RETURNING *`,
               [idRegistro],
@@ -303,16 +310,25 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
               return gotoFlow(mainFlow);
             }
 
-            // 2. Si se borró con éxito, registramos el rechazo
-            await pool.query(
-              `INSERT INTO registro_aprobaciones (datos_completos, estado, aprobador, tabla_origen, fecha_decision) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
-              [
-                JSON.stringify(deleteResult.rows[0]),
-                "rechazado",
-                usuario,
-                tablaAsignada,
-              ],
-            );
+            try {
+              await pool.query(
+                `INSERT INTO registro_aprobaciones (datos_completos, estado, aprobador, tabla_origen, fecha_decision) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)`,
+                [
+                  JSON.stringify(deleteResult.rows[0]),
+                  "rechazado",
+                  usuario,
+                  tablaAsignada,
+                ],
+              );
+            } catch (dbError: any) {
+              if (dbError.code === "23505") {
+                await flowDynamic(
+                  "⚠️ Esta requisición ya fue registrada y procesada por otro medio.",
+                );
+                return gotoFlow(mainFlow);
+              }
+              throw dbError;
+            }
 
             await flowDynamic(
               "🔴 Solicitud rechazada y guardada en base de datos.",
