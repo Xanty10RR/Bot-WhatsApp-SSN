@@ -79,6 +79,7 @@ const mainFlow = addKeyword([
   "menu",
   EVENTS.WELCOME,
 ]).addAction(async (ctx, { provider }) => {
+  
   // Este log debe aparecer en tu terminal apenas escribas en WhatsApp
   console.log("🔥 ¡Mensaje recibido de:", ctx.from);
 
