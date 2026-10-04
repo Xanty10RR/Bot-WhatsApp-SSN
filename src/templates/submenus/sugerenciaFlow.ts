@@ -72,7 +72,7 @@ export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
       const opcion = ctx.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const myState = state.getMyState();
 
-      // Si acepta la sugerencia (SI, btn_si, o "1")
+      // Si acepta la sugerencia (SI, btn_si, o 1)
       if ((opcion === "si" || opcion === "btn_si" || opcion === "1") && myState.sugerenciaTexto) {
         const texto = myState.sugerenciaTexto;
         const resultado = await ConvenioService.buscar(texto);
