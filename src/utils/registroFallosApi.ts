@@ -6,7 +6,7 @@ const supabase = createClient(
 );
 
 // Registra un error de API's o del bot en la tabla (errores_api)
-// Reemplazar esto con la URL real de tu servidor de métricas en Render o localhost en desarrollo
+// Reemplazar esto con la URL real dek servidor de métricas en Render o localhost en desarrollo
 
 const METRICS_SERVER_URL = process.env.METRICS_SERVER_URL || 'http://localhost:3003';
 
