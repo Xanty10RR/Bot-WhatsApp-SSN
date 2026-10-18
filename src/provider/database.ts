@@ -1,15 +1,32 @@
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { Pool } from "pg";
 
-dotenv.config();
+const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 export const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: parseInt(process.env.DB_PORT || '5432'),
-    ssl: {
-        rejectUnauthorized: false,
-    },
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT) || 5432,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
+
+// 👇 ¡Pégala aquí abajito de tu pool!
+export const actividadRecienteUsuario = async (telefono: string, nuevaAccion: string) => {
+  try {
+    await pool.query(
+      `UPDATE sesiones_chat 
+       SET ultima_accion = $1, ultimo_mensaje = NOW() 
+       WHERE telefono = $2`,
+      [nuevaAccion, telefono]
+    );
+  } catch (error) {
+    console.error('⚠️ Error al actualizar ultima_accion del usuario:', error);
+  }
+};
