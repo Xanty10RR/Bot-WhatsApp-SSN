@@ -8,6 +8,7 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { mainFlow } from "../mainFlow";
 import { registrarErrorApi } from "../../utils/registroFallosApi";
+import { actividadRecienteUsuario } from "../../provider/database";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -57,6 +58,8 @@ const mostrarMenuBotones = async (ctx: any, texto: string, botones: any[]) => {
 
 export const sugerenciaFlow = addKeyword(EVENTS.ACTION)
   .addAction(async (ctx, { state }) => {
+    await actividadRecienteUsuario(ctx.from, "Buscando convenio");
+
     const myState = state.getMyState();
     const texto = `❌ No encontré coincidencias para:\n\n"${myState.textoOriginal}"\n\n🤔 ¿Quisiste decir?\n\n📋 *${myState.sugerenciaTexto}*\n\n✅ Presiona *SI* para consultar este convenio.\n\n🔄 O presiona *OTRO NOMBRE* para realizar una nueva búsqueda.`;
     
