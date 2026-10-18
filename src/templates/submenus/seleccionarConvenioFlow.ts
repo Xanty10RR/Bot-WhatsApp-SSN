@@ -12,6 +12,7 @@ const __dirname = dirname(__filename);
 
 export const seleccionarConvenioFlow: any = addKeyword(EVENTS.ACTION)
   .addAction(async (ctx, { state, flowDynamic }) => {
+    // Actualizar dinámicamente en vivo la intención/flujo en el Centro de Operaciones - Chatbot SuperAsistente
     await actividadRecienteUsuario(ctx.from, "Buscando convenio");
 
     const myState = state.getMyState();
