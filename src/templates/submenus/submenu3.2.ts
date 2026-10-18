@@ -337,6 +337,8 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
               throw dbError;
             }
 
+            await actividadRecienteUsuario(ctx.from, "Rechazó una requisición");
+
             await flowDynamic(
               "🔴 Solicitud rechazada y guardada en base de datos.",
             );
