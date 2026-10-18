@@ -87,7 +87,7 @@ const mainFlow = addKeyword([
   await registrarInteraccionBot(
     ctx.from,
     ctx.pushName,
-    "Inició conversación (Menú Principal)",
+    "Inició conversación (menú principal)",
   );
 
   const list = {
