@@ -16,6 +16,10 @@ export const pool = new Pool({
 });
 
 export const RequisicionSolicitud: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
+  .addAction(async (ctx) => {
+    // Actualizar dinámicamente en vivo la intención/flujo en el Centro de Operaciones - Chatbot SuperAsistente
+    await actividadRecienteUsuario(ctx.from, "Creando una requisición");
+  })
   .addAnswer(
     "¡Vamos a crear una nueva requisición!.\nPor favor, dime tu *nombre completo* (_solo texto_):",
     { capture: true },
@@ -192,8 +196,7 @@ export const RequisicionSolicitud: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
           datos.observaciones,
         ],
       );
-      
-      // Actualizar dinámicamente en vivo la intencion/flujo en el Centro de Operaciones - Chatbot SuperAsistente
+      // // Actualizar dinámicamente en vivo la intencion/flujo
       await actividadRecienteUsuario(ctx.from, 'Creó una requisición');
 
       await flowDynamic(
