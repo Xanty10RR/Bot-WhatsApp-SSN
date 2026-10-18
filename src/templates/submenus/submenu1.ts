@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { seleccionarConvenioFlow } from "./seleccionarConvenioFlow";
 import { sugerenciaFlow } from "./sugerenciaFlow";
 import { mainFlow } from "../mainFlow";
+import { actividadRecienteUsuario } from "../../provider/database";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,6 +19,10 @@ export const submenu1Flow: any = addKeyword(MENU_IDS.PRINCIPAL.OPCION1)
     { capture: true },
     async (ctx, { flowDynamic, gotoFlow, state }) => {
       const texto = ctx.body.trim();
+
+      // Actualizar dinámicamente en vivo la intencion/flujo en el Centro de Operaciones - Chatbot SuperAsistente
+      // Registramos en tiempo real la búsqueda del convenio en la base de datos
+      await actividadRecienteUsuario(ctx.from, `Buscó convenio: "${texto}"`);
       const resultado = await ConvenioService.buscar(texto);
 
       const coincidencias = [
