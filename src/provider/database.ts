@@ -17,7 +17,6 @@ export const pool = new Pool({
   },
 });
 
-// 👇 ¡Pégala aquí abajito de tu pool!
 export const actividadRecienteUsuario = async (telefono: string, nuevaAccion: string) => {
   try {
     await pool.query(
@@ -27,6 +26,6 @@ export const actividadRecienteUsuario = async (telefono: string, nuevaAccion: st
       [nuevaAccion, telefono]
     );
   } catch (error) {
-    console.error('⚠️ Error al actualizar ultima_accion del usuario:', error);
+    console.error('⚠️ Error al actualizar ultima accion del usuario en tabla sesiones_chat:', error);
   }
 };
