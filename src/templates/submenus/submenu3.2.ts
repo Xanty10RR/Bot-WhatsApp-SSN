@@ -4,6 +4,7 @@ import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import { mainFlow } from "../mainFlow";
 import { registrarErrorApi } from "../../utils/registroFallosApi";
+import { actividadRecienteUsuario } from "../../provider/database";
 
 // Configuración de PostgreSQL
 export const pool = new Pool({
@@ -57,6 +58,8 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
             await flowDynamic("📭 No hay requisiciones pendientes.");
             return gotoFlow(mainFlow);
           }
+          // Actualizar dinámicamente en vivo la intención/flujo en el Centro de Operaciones - Chatbot SuperAsistente
+          await actividadRecienteUsuario(ctx.from, "Revisando requisiciones");
 
           await state.update({
             usuario: "invitado",
@@ -123,6 +126,8 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
           await flowDynamic("📭 No hay registros en tu tabla asignada.");
           return gotoFlow(mainFlow);
         }
+        // Actualizar dinámicamente en vivo la intención/flujo 
+        await actividadRecienteUsuario(ctx.from, "Revisando requisiciones");
 
         const opciones = filas.map(
           (fila, i) =>
@@ -289,6 +294,8 @@ export const VerificarIdentidad: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION2)
               }
               throw dbError; // Si es otro error, que lo atrape el catch general
             }
+            // Actualizar dinámicamente en vivo la intención/flujo 
+            await actividadRecienteUsuario(ctx.from, "Aprobó una requisición");
 
             await flowDynamic(
               "🟢 Solicitud aprobada y guardada en base de datos.",
