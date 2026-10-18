@@ -2,6 +2,7 @@ import { addKeyword } from "@builderbot/bot";
 import { MENU_IDS } from "../constants";
 import { Pool } from "pg";
 import { registrarErrorApi } from "../../utils/registroFallosApi";
+import { actividadRecienteUsuario } from "../../provider/database";
 
 // Configuración de PostgreSQL
 const dbPort = Number(process.env.DB_PORT ?? "5432");
@@ -191,6 +192,9 @@ export const RequisicionSolicitud: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
           datos.observaciones,
         ],
       );
+      
+      // Actualizar en vivo la intencion/flujo en el Centro de Operaciones - Chatbot SuperAsistente
+      await actividadRecienteUsuario(ctx.from, 'Creó una Requisición');
 
       await flowDynamic(
         "✅ Solicitud guardada exitosamente. Se ha notificado al jefe del área.",
@@ -211,8 +215,12 @@ export const RequisicionSolicitud: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
     ]);
   })
   .addAction({ capture: true }, async (ctx, { gotoFlow }) => {
-    if (ctx.body.includes("Nueva") || ctx.body.includes("📝"))
-      return gotoFlow(RequisicionSolicitud);
-    const { mainFlow } = await import("../mainFlow");
-    return gotoFlow(mainFlow);
-  });
+  if (ctx.body.includes("Nueva") || ctx.body.includes("📝")) {
+    await actividadRecienteUsuario(ctx.from, 'Creando nueva Requisición');
+    return gotoFlow(RequisicionSolicitud);
+  }
+
+  await actividadRecienteUsuario(ctx.from, 'Volvió al Menú Principal');
+  const { mainFlow } = await import("../mainFlow");
+  return gotoFlow(mainFlow);
+});
