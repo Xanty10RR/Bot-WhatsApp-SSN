@@ -193,7 +193,7 @@ export const RequisicionSolicitud: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
         ],
       );
       
-      // Actualizar en vivo la intencion/flujo en el Centro de Operaciones - Chatbot SuperAsistente
+      // Actualizar dinámicamente en vivo la intencion/flujo en el Centro de Operaciones - Chatbot SuperAsistente
       await actividadRecienteUsuario(ctx.from, 'Creó una Requisición');
 
       await flowDynamic(
@@ -216,10 +216,13 @@ export const RequisicionSolicitud: any = addKeyword(MENU_IDS.SUBMENU_3.OPCION1)
   })
   .addAction({ capture: true }, async (ctx, { gotoFlow }) => {
   if (ctx.body.includes("Nueva") || ctx.body.includes("📝")) {
+
+    // Actualizar dinámicamente en vivo la intencion/flujo
     await actividadRecienteUsuario(ctx.from, 'Creando nueva Requisición');
     return gotoFlow(RequisicionSolicitud);
   }
 
+  // Actualizar dinámicamente en vivo la intencion/flujo
   await actividadRecienteUsuario(ctx.from, 'Volvió al Menú Principal');
   const { mainFlow } = await import("../mainFlow");
   return gotoFlow(mainFlow);
