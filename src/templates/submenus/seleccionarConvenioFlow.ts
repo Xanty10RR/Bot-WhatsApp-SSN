@@ -5,12 +5,15 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { submenu1Flow } from "./submenu1";
 import { mainFlow } from "../mainFlow";
+import { actividadRecienteUsuario } from "../../provider/database";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export const seleccionarConvenioFlow: any = addKeyword(EVENTS.ACTION)
   .addAction(async (ctx, { state, flowDynamic }) => {
+    await actividadRecienteUsuario(ctx.from, "Buscando convenio");
+
     const myState = state.getMyState();
     
     // Si viene de una búsqueda nueva, guardamos toda la lista y ponemos la página en 0
